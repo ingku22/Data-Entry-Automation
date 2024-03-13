@@ -1,0 +1,18 @@
+[
+'MENU TNTERNATIONAL FOOD',
+'STARTERS',
+'DESSERTS', 
+'PISCES $10 HYDRA $10 Pisces 15 Zodlac constellatlon Hydra Is the biggest constellation AQUARIUS $10 TAURUS $10 Aquarius means "the Water-bearer\' Taurus is the oldest constellation ARIES $10 SIRIUS $10 Aries Is the first sign ofthe zodiac Sirius 15 the brightest star', 
+'BEEE',
+'CHICKEN',
+'PISCES $10 Pisces Is zodlac constellation', 
+'HYDRA $10 Hydra is the biggest constellation TAURUS $10 Taurus is the oldest constellation', 
+'AQUARIUS $10 Aquarlus means "the Water-bearer\'', 
+'ARIES $10 Ariesis the TrSt sign ofthe Zodiac', 
+'SIRIUS Sirlus is the brightest star', 
+'$10', 
+'DRINKS',
+'WINES',
+"PISCES $10 HYDRA $10 Pisces Is Zodlac constellation Hydra Is the biggest constellation AQUARIUS $10 TAURUS $10 Aquarius means Ine water-bearer' Taurus is the oldest constellation ARIES $10 SIRIUS  $10 Aries is the trst slgn ofthe Zodiac Slrius is the brightest star", 
+'WWWYOURWEBSITE.COM'
+]
