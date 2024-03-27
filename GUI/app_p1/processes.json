@@ -1,0 +1,17 @@
+{"Image_to_Excel": 
+    {
+        "stages": 
+            {"Preparation": ["Booting OCR Model",
+                            "",
+                            "",
+                            "",
+                            ""],
+
+            "Extracting Data": ["","","","","",""],
+
+            "Excel Writing": [""]
+            }
+
+    }
+}
+
