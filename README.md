@@ -35,7 +35,7 @@ This project aims to create an application that allows new merchants to upload i
 
 1. Obtain the .exe file, click the .exe file to activate the tkinter application front end. 
 
-[Refer to Deployment](##Deployment)
+[Refer to Deployment](#Deployment)
 
 
 
@@ -72,7 +72,11 @@ To run this project, you will need to have the following modules
 Project has been intended to be deployed as a .exe file via the use of pyinstaller using the following command
 
 ```bash
-  pyinstaller -w --onefile --add-data "GUI/final_product" main.py
+  pyinstaller -w --onefile
+--add-data "final_product/assets;assets"
+--add-data "final_product/pages;pages"
+--add-data "final_product/preprocess.json;."
+final_product/main.py
 ```
 
 #### Current Versions ***(WIP)
