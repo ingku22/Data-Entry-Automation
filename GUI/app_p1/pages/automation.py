@@ -8,6 +8,7 @@ from pathlib import Path
 # from tkinter import *
 # Explicit imports to satisfy Flake8
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+from backend.automationprocess import automation_process
 
 
 BASE_PATH = Path(__file__).resolve().parent.parent
@@ -103,7 +104,7 @@ automate_btn = Button(
     image=button_image_1,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("button_1 clicked"),
+    command=lambda: automation_process(),
     relief="flat"
 )
 automate_btn.place(
