@@ -1,10 +1,20 @@
-from tkinter import filedialog, messagebox, Canvas
+from tkinter import filedialog, messagebox
 import tkinter as tk
 from PIL import Image, ImageTk
+from pathlib import Path
 
 
 SUPPORTED_FILE_TYPES = ['png', 'jpg', 'jpeg']
 
+# --------------------------------     
+# File to path FUNCTIONS
+# --------------------------------
+
+
+
+# --------------------------------     
+# IMAGE FILE FUNCTIONS
+# --------------------------------
 def select_file():
 
     # content = Textbox.get(1.0, tk.END)
@@ -36,6 +46,30 @@ def select_file():
     else:
         pass
 
+def resize(img, target_width=None, target_height=None):
+        original_width, original_height = img.size
+        # Select how small to resize
+        img_ratio = original_width / original_height # r > 1, img is landscape, r < 1, img is portriat
+
+        if img_ratio > 1:
+            target_width = target_width
+            target_height = None
+        elif img_ratio <= 1:
+            target_width = None
+            target_height = target_height
+
+        # Resizing logic
+        if target_width and not target_height:
+            target_height = int((target_width / original_width) * original_height)
+        elif target_height and not target_width:
+            target_width = int((target_height / original_height) * original_width)
+        resized_img = img.resize((target_width, target_height), Image.Resampling.LANCZOS)
+        
+        width, height = resized_img.size
+        print(f'size:{width}x{height}')
+
+        return resized_img, (width, height)
+
 def display_select_file(target_width=None, target_height=None, Container=None, archive_function=None):
 
     # Get the file path
@@ -47,30 +81,10 @@ def display_select_file(target_width=None, target_height=None, Container=None, a
     if file_path:
         # Resized Image for fitting with the visual display in the application
         with Image.open(file_path) as img:
-            original_width, original_height = img.size
-            
-            # Select how small to resize
-            img_ratio = original_width / original_height # r > 1, img is landscape, r < 1, img is portriat
-
-            if img_ratio > 1:
-                target_width = target_width
-                target_height = None
-            elif img_ratio <= 1:
-                target_width = None
-                target_height = target_height
-
-            # Resizing logic
-            if target_width and not target_height:
-                target_height = int((target_width / original_width) * original_height)
-            elif target_height and not target_width:
-                target_width = int((target_height / original_height) * original_width)
-            resized_img = img.resize((target_width, target_height), Image.Resampling.LANCZOS)
-        
-        width, height = resized_img.size
-        print(f'size:{width}x{height}')
+            resized_img, size = resize(img, target_width=target_width, target_height=target_height)
         tk_image = ImageTk.PhotoImage(resized_img)
 
-        return tk_image, (width, height)
+        return tk_image, size, resized_img, file_path
 
     else:
         print('filepath has not been defined')
