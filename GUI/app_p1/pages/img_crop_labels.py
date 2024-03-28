@@ -30,6 +30,8 @@ class img_crop_label:
         self.window = Frame(root)
         self.crop_mode = False
         self.current_crop = None
+        self.coordinates = None
+        self.crops_info = {}
 
         self.canvas = Canvas(
             self.window,
@@ -343,18 +345,19 @@ class img_crop_label:
             font=("MS Sans Serif", 12)
         )
 
-        # Menu Category Data
+        # Menu Category Data Init
         LABEL_COLUMNS = ['Category', 'Cropped Dimensions']
-        LABEL_DATA = [
-            ['Appetizers', '[35,35,35,35]'],
-            ['Drinks', '[35,35,35,35]'],
-            ['Soups', '[35,35,35,35]'],
-            ['Main Dish', '[35,35,35,35]'],
-            ['Pizza Toppings', '[35,35,35,35]'],
-            ['Specials', '[35,35,35,35]'],
-            ['Desserts', '[35,35,35,35]'],
-            ['Retail', '[35,35,35,35]']
-        ]
+        LABEL_DATA = [['--', '(-, -, -, -)']]
+        # LABEL_DATA = [
+        #     ['Appetizers', '[35,35,35,35]'],
+        #     ['Drinks', '[35,35,35,35]'],
+        #     ['Soups', '[35,35,35,35]'],
+        #     ['Main Dish', '[35,35,35,35]'],
+        #     ['Pizza Toppings', '[35,35,35,35]'],
+        #     ['Specials', '[35,35,35,35]'],
+        #     ['Desserts', '[35,35,35,35]'],
+        #     ['Retail', '[35,35,35,35]']
+        # ]
 
         # Menu Category Data Table
         self.canvas.create_text(
@@ -462,7 +465,7 @@ class img_crop_label:
         width, height = size
         
         self.image_visual.config(width=width, height=height)
-        self.image_visual.create_image(width/2, height/2, image=tk_image)
+        self.current_image = self.image_visual.create_image(width/2, height/2, image=tk_image)
         self.image_visual.place(x=(210.0 - width/2), y= (247.0 - height/2))
 
         if f'{tk_image}'[:-2] == 'pyimage':
@@ -496,9 +499,9 @@ class img_crop_label:
     # obtaining/verifying cropped label row data
 
     def verify_cropped_label_data(self):
-        cropped_label = [self.category_name_entry.get(),'[35,35,35,35]']
+        cropped_label = [self.category_name_entry.get(), str(self.coordinates)]
 
-        if (type(cropped_label[0]) == str) and (type(cropped_label[1]) == str) and type(ast.literal_eval(cropped_label[1])) == list:
+        if (type(cropped_label[0]) == str) and (type(cropped_label[1]) == str) and type(ast.literal_eval(cropped_label[1])) in [list, tuple]:
 
             if len(ast.literal_eval(cropped_label[1])) == 4:
                 # send it to add_data to the update table
@@ -546,13 +549,13 @@ class img_crop_label:
     def start_cropping(self, event):
         self.start_x = self.image_visual.canvasx(event.x)
         self.start_y = self.image_visual.canvasy(event.y)
-        self.rectangle = self.image_visual.create_rectangle(self.start_x, self.start_y, self.start_x, 
+        self.current_crop = self.image_visual.create_rectangle(self.start_x, self.start_y, self.start_x, 
                                                       self.start_y, outline="yellow", width=4)
 
     def draw_rectangle(self, event):
         cur_x = self.image_visual.canvasx(event.x)
         cur_y = self.image_visual.canvasy(event.y)
-        self.image_visual.coords(self.rectangle, self.start_x, self.start_y, cur_x, cur_y)
+        self.image_visual.coords(self.current_crop, self.start_x, self.start_y, cur_x, cur_y)
 
     def end_cropping(self, event):
 
@@ -562,13 +565,25 @@ class img_crop_label:
         self.image_visual.unbind("<B1-Motion>")
         self.image_visual.unbind("<ButtonRelease-1>")
 
-        end_x = self.image_visual.canvasx(event.x)
-        end_y = self.image_visual.canvasy(event.y)
+        end_x = min(max(event.x, 0), self.image_visual.winfo_width())
+        end_y = min(max(event.y, 0), self.image_visual.winfo_height())
+        self.image_visual.itemconfig(self.current_crop, outline="lime")
+        x1 = min(self.start_x, end_x)
+        y1 = min(self.start_y, end_y)
+        x2 = max(self.start_x, end_x)
+        y2 = max(self.start_y, end_y)
+
+        self.coordinates = (x1, y1, x2, y2)
         
         # Calculate the width and height of the cropped area
-        width = end_x - self.start_x
-        height = end_y - self.start_y
-        print(f'Cropped: {self.start_x}, {self.start_y}, {end_x}, {end_y}')
+        width = x2 - x1
+        height = y2 - y1
+        print(f'Cropped: {x1}, {y1}, {x2}, {y2}')
+        self.adjust_cropping()
+
+    def adjust_cropping(self):
+        x1, y1, x2, y2 = self.coordinates
+        self.image_visual.coords(self.current_crop, x1, y1, x2, y2)
 
 
     # ------------------------
