@@ -7,8 +7,7 @@ from pathlib import Path
 import ast
 
 from tkinter import Tk, ttk, messagebox, Canvas, Entry, Text, Button, PhotoImage, Frame, BOTH
-
-# Backend imports
+from idlelib.tooltip import Hovertip
 from backend.table_methods import get_ttk_table
 from backend.data_methods import tree_add_data, tree_remove_all_data
 from backend.file_methods import display_select_file
@@ -135,6 +134,9 @@ class img_crop_label:
             width=137.0,
             height=32.0
         )
+
+        self.add_cropped_tip = Hovertip(self.add_cropped_label_btn,
+                                        'Add Cropped Label and Category Name\nCrop Data will appear in the data table on your right', hover_delay=10)
         # ===========================================
 
         self.button_image_1 = PhotoImage(
@@ -152,6 +154,9 @@ class img_crop_label:
             width=128.0,
             height=32.0
         )
+
+        self.browse_files_tip = Hovertip(self.browse_files_btn,
+                                         'Button to import images.\nImages uploaded will not dissapear unless replaced with another image.', hover_delay=10)
 
         self.image_image_4 = PhotoImage(
             file=self.relative_to_assets("image_4.png"))
@@ -233,6 +238,8 @@ class img_crop_label:
         )
 
         self.download_folder_btn.config(state='disable')
+        self.download_folder_tip = Hovertip(self.download_folder_btn,
+                                            'Press here to download the zip file of all your cropped menu categories.\nAll the image data in the table will be included in your downloaded zip file', hover_delay=10)
 
         self.button_image_5 = PhotoImage(
             file=self.relative_to_assets("button_5.png"))
@@ -250,9 +257,12 @@ class img_crop_label:
             height=46.0
         )
 
+        self.clear_all_tip = Hovertip(self.clear_all_btn,
+                                     'Deletes all table data of cropped images.\nCrops on the Image and in the data table will be deleted', hover_delay=10)
+
         self.button_image_6 = PhotoImage(
             file=self.relative_to_assets("button_6.png"))
-        self.button_6 = Button(
+        self.zoom_in_btn = Button(
             self.window,
             image=self.button_image_6,
             borderwidth=0,
@@ -260,7 +270,7 @@ class img_crop_label:
             command=lambda: print("button_6 clicked"),
             relief="flat"
         )
-        self.button_6.place(
+        self.zoom_in_btn.place(
             x=445.0,
             y=127.0,
             width=25.0,
@@ -269,7 +279,7 @@ class img_crop_label:
 
         self.button_image_7 = PhotoImage(
             file=self.relative_to_assets("button_7.png"))
-        self.button_7 = Button(
+        self.zoom_out_btn = Button(
             self.window,
             image=self.button_image_7,
             borderwidth=0,
@@ -277,7 +287,7 @@ class img_crop_label:
             command=lambda: print("button_7 clicked"),
             relief="flat"
         )
-        self.button_7.place(
+        self.zoom_out_btn.place(
             x=475.0,
             y=127.0,
             width=25.0,
@@ -301,9 +311,12 @@ class img_crop_label:
             height=26.304079055786133
         )
 
+        self.add_crop_tip = Hovertip(self.add_crop_btn,
+                                     'Activates CROP MODE\nAllows you to crop images. Only active when no current crop is made.\nTo enable the Add Crop Button, ensure that all previous crops have been labelled and added to the table.\n Yellow - Unlabelled\nGreen - Labelled', hover_delay=10)
+
         self.button_image_9 = PhotoImage(
             file=self.relative_to_assets("button_9.png"))
-        self.button_9 = Button(
+        self.delete_crop_btn = Button(
             self.window,
             image=self.button_image_9,
             borderwidth=0,
@@ -311,12 +324,15 @@ class img_crop_label:
             command=lambda: print("button_9 clicked"),
             relief="flat"
         )
-        self.button_9.place(
+        self.delete_crop_btn.place(
             x=543.0,
             y=98.0,
             width=111.0,
             height=25.0
         )
+
+        self.delete_crop_tip = Hovertip(self.delete_crop_btn,
+                                     'Deletes Selected Crop\nOnly active if a crop data is selecte.\nTo enable the Delete Crop Button, ensure that you have selected a crop to delete in the data table below.', hover_delay=10)
 
         self.canvas.create_text(
             444.0,
@@ -384,6 +400,9 @@ class img_crop_label:
             height=25.0
         )
 
+        self.button_10_tip = Hovertip(self.button_10,
+                                     'Button to import images.\nImages uploaded will not dissapear unless replaced with another image.', hover_delay=10)
+
         self.image_image_5 = PhotoImage(
             file=self.relative_to_assets("image_5.png"))
         self.image_5 = self.canvas.create_image(
@@ -394,7 +413,7 @@ class img_crop_label:
 
         self.button_image_11 = PhotoImage(
             file=self.relative_to_assets("button_11.png"))
-        self.button_11 = Button(
+        self.refresh_btn = Button(
             self.window,
             image=self.button_image_11,
             borderwidth=0,
@@ -402,12 +421,15 @@ class img_crop_label:
             command=lambda: print("button_11 clicked"),
             relief="flat"
         )
-        self.button_11.place(
+        self.refresh_btn.place(
             x=505.0,
             y=127.0,
             width=25.0,
             height=25.0
         )
+
+        self.refresh_tip = Hovertip(self.refresh_btn,
+                                     'Refreshes the Image to its original fullsize.\nAll Cropped Plots are also displayed on the Image.', hover_delay=10)
 
         self.button_image_12 = PhotoImage(
             file=self.relative_to_assets("button_12.png"))
@@ -424,6 +446,9 @@ class img_crop_label:
             width=25.0,
             height=25.0
         )
+
+        self.remove_img_tip = Hovertip(self.remove_img_btn,
+                                     'Button to remove images.\nImage will be removed along with the table data.', hover_delay=10)
 
         self.init_button_commands()
 
