@@ -6,10 +6,11 @@
 from pathlib import Path
 import ast
 
-from tkinter import Tk, ttk, messagebox, Canvas, Entry, Text, Button, PhotoImage, Frame, BOTH
+from tkinter import Tk, ttk, messagebox, Canvas, Entry, Text, Button, PhotoImage, Frame
+from tkinter import BOTH, END
 from idlelib.tooltip import Hovertip
-from backend.table_methods import get_ttk_table
-from backend.data_methods import tree_add_data, tree_remove_all_data
+from backend.table_methods import get_ttk_table, tree_add_data, tree_remove_all_data
+# from backend.data_methods import
 from backend.file_methods import display_select_file
 
 class img_crop_label:
@@ -488,8 +489,12 @@ class img_crop_label:
         self.button_10.config(command=self.display_original_img)
         self.remove_img_btn.config(command=self.remove_original_img)
         self.add_cropped_label_btn.config(command=self.verify_cropped_label_data)
-
+        
         self.clear_all_btn.config(command=self.clear_all_label_data)
+        self.cropped_label_table.bind("<ButtonRelease-1>", self.select_crop)
+
+        # self.add_cropped_label_btn.bind('<Return>', lambda event: self.verify_cropped_label_data())
+        # self.window.focus_set()
 
 
     # Save Cropped Images
@@ -507,7 +512,20 @@ class img_crop_label:
                 # send it to add_data to the update table
                 print('Data Updated')
                 print(cropped_label)
+                
+                self.crops_info[cropped_label[0]] = [self.current_crop, self.coordinates]
                 tree_add_data(data=cropped_label, table=self.cropped_label_table)
+
+                self.category_name_entry.delete(0, END)
+                self.coordinates = None
+
+                # Enable Crop Mode again
+                self.crop_mode = True
+                print('Crop Mode is On')
+
+                self.image_visual.bind("<ButtonPress-1>", self.start_cropping)
+                self.image_visual.bind("<B1-Motion>", self.draw_rectangle)
+                self.image_visual.bind("<ButtonRelease-1>", self.end_cropping)
 
             else:
                 messagebox.showerror(title='DataFormatError',
@@ -521,6 +539,26 @@ class img_crop_label:
 
     def clear_all_label_data(self):
         tree_remove_all_data(table=self.cropped_label_table)
+        for rect in self.crops_info.values():
+            self.image_visual.delete(rect[0])
+
+        self.crops_info.clear()
+
+
+    def select_crop(self, event):
+        item = int(self.cropped_label_table.selection()[0][1:])
+        print(item)
+        print(self.crops_info)
+        if item == 1:
+            for r in self.crops_info.values():
+                self.image_visual.itemconfig(r[0], outline="lime")  # Reset all outlines
+        elif item <= len(list(self.crops_info.keys()))+1:
+            rect, _ = list(self.crops_info.values())[item-2]
+            for r in self.crops_info.values():
+                self.image_visual.itemconfig(r[0], outline="lime")  # Reset all outlines
+            self.image_visual.itemconfig(rect, outline="blue")   # Set selected outline to blue
+        else:
+            print("Error: Selected item not found in crop dictionary")
     
     # --------------------------------     
     # CROPPING FUNCTIONS
@@ -598,6 +636,7 @@ class img_crop_label:
 
     def pack_forget(self):
         self.window.pack_forget()
+        self.window.unbind_all()
 
 
 
