@@ -53,6 +53,7 @@ This project aims to create an application that allows new merchants to upload i
 ## Requirements
 
 To run this project, you will need to have the following modules
+(Additionally, do remember to have the google browser as the default and current browser)
 
 `pillow == 10.2.0`
 
@@ -65,6 +66,10 @@ To run this project, you will need to have the following modules
 `selenium == 4.18.1`
 
 `openpyxl == 3.1.2`
+
+PS. If there is an error with selenium, do check if the google browser version is 
+compatible with the chromedriver located in 
+`env/Lib/selenium/chromedriver`
 
 
 ## Deployment
