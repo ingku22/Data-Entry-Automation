@@ -19,7 +19,7 @@ class PaginationApp:
         self.show_page(self.current_page)
         
     def create_pages(self):
-        menu_items = ['Home', "Image to Excel Reader", 
+        menu_items = ['Home', "Image to Excel Reader", "Image to Excel Reader +", 
                       "Crop Toolkit and Viewer", "Expanded Crop Toolkit", 
                       "Merchant Onboarding", "Settings"]
         item_types = ['hype', 'sigma', 'decent', 'mid', 'low af', 'L+cringe+ratio']
@@ -75,6 +75,7 @@ class PaginationApp:
         menu_bar.add_cascade(label="Automation Toolkits", menu=toolkits_menu)
 
         toolkits_menu.add_command(label="Image to Excel Reader", command=lambda: self.show_page("Image to Excel Reader"))
+        toolkits_menu.add_command(label="Image to Excel Reader +", command=lambda: self.show_page("Image to Excel Reader +"))
 
         cropping_menu = tk.Menu(toolkits_menu, tearoff=0)
         toolkits_menu.add_cascade(label="Category Cropping Toolkit", menu=cropping_menu)

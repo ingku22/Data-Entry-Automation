@@ -12,7 +12,7 @@ from tkinter import BOTH, END
 from idlelib.tooltip import Hovertip
 from backend.table_methods import get_ttk_table, tree_add_data, tree_remove_all_data
 # from backend.data_methods import
-from backend.file_methods import display_select_file, resize
+from backend.file_methods import display_select_file, resize, zip_n_download
 
 class img_crop_label:
     def relative_to_assets(self, path: str) -> Path:
@@ -25,9 +25,11 @@ class img_crop_label:
 
         # Define the relative path to the assets directory
         ASSETS_REL_PATH = Path("assets/frame1")
+        STAGING_REL_PATH = Path("assets/staging")
 
         # Define the absolute path to the assets directory
         self.ASSETS_PATH = BASE_PATH / ASSETS_REL_PATH
+        self.STAGING_PATH = BASE_PATH / STAGING_REL_PATH
 
         self.window = Frame(root)
         self.crop_mode = False
@@ -237,7 +239,7 @@ class img_crop_label:
             image=self.button_image_4,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_4 clicked"),
+            command=self.saved_cropped_img,
             relief="flat"
         )
         self.download_folder_btn.place(
@@ -247,7 +249,7 @@ class img_crop_label:
             height=46.0
         )
 
-        self.download_folder_btn.config(state='disable')
+        # self.download_folder_btn.config(state='disable')
         self.download_folder_tip = Hovertip(self.download_folder_btn,
                                             'Press here to download the zip file of all your cropped menu categories.\nAll the image data in the table will be included in your downloaded zip file', hover_delay=10)
 
@@ -524,8 +526,15 @@ class img_crop_label:
 
 
     # Save Cropped Images
-    def saved_cropped_img():
-        return
+    def saved_cropped_img(self):
+        for category, crop_stats in self.crops_info.items():
+            _, coords = crop_stats
+            cropped_img, _ = self.get_cropped_image(coords)
+            cropped_img.save(self.STAGING_PATH / f'{category}.jpg')
+
+            print(f'category {category} saved into staging folder')
+
+        zip_n_download(self.STAGING_PATH)
 
     # obtaining/verifying cropped label row data
 

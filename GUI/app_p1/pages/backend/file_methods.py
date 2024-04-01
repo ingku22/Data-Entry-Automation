@@ -1,6 +1,10 @@
 from tkinter import filedialog, messagebox
 import tkinter as tk
 from PIL import Image, ImageTk
+
+import os
+import shutil
+import zipfile
 from pathlib import Path
 
 
@@ -13,18 +17,27 @@ SUPPORTED_FILE_TYPES = ['png', 'jpg', 'jpeg']
 
 
 # --------------------------------     
+# ZIP FILE FUNCTIONS
+# --------------------------------
+def zip_n_download(staging_path):
+    # Create a zip file
+    zip_filename = "staging.zip"
+    with zipfile.ZipFile(zip_filename, 'w') as zipf:
+        # Add all files and directories in the staging folder to the zip file
+        for root, dirs, files in os.walk(staging_path):
+            for file in files:
+                file_path = Path(root) / file
+                zipf.write(file_path, file_path.relative_to(staging_path))
+
+    # Move the zip file to the user's Downloads directory
+    downloads_path = Path.home() / "Downloads"
+    shutil.move(zip_filename, downloads_path / zip_filename)
+    print(f"Zip file saved to: {downloads_path / zip_filename}")
+
+# --------------------------------     
 # IMAGE FILE FUNCTIONS
 # --------------------------------
 def select_file():
-
-    # content = Textbox.get(1.0, tk.END)
-
-    # # Check if there is 3 images
-    # num_images = content.split('\n')
-    # if len(num_images) - 2 >= 3:
-    #     print(num_images)
-    #     messagebox.showerror(title='OverloadError',
-    #                          message='This application currently only supports 3 images per run due to the processing time.')
 
     file_path = filedialog.askopenfilename()
 
