@@ -409,7 +409,7 @@ class image2excel:
 
         # ============================== DIRECT BACKEND ===============================
     def display_preview(self, Textbox):
-        tk_image, size = display_select_file(Container=Textbox, target_width=200, target_height=130, archive_function=archive_to_textbox)
+        tk_image, size, ref, filepath = display_select_file(Container=Textbox, target_width=200, target_height=130, archive_function=archive_to_textbox)
         self.canvas.itemconfig(self.image_visual, image=tk_image)
 
         # Keep a reference to tk_image to prevent garbage collection
