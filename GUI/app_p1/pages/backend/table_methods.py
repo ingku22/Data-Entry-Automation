@@ -57,4 +57,7 @@ def tree_remove_all_data(table):
     if type(table) != ttk.Treeview:
         pass
     else:
-        table.delete(*table.get_children())
+        children = table.get_children()
+        if children:  # Check if there are any children
+            # Delete all children except the first one
+            table.delete(*children[1:])

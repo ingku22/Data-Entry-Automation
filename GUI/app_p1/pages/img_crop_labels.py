@@ -416,10 +416,11 @@ class img_crop_label:
 
         self.image_image_5 = PhotoImage(
             file=self.relative_to_assets("image_5.png"))
-        self.image_5 = self.canvas.create_image(
+        self.crop_not_found = self.canvas.create_image(
             559.0,
             226.0,
-            image=self.image_image_5
+            image=self.image_image_5,
+            tag=('crop_not_found')
         )
 
         self.cropped_image_visual = Canvas(
@@ -516,6 +517,7 @@ class img_crop_label:
         
         self.clear_all_btn.config(command=self.clear_all_label_data)
         self.cropped_label_table.bind("<ButtonRelease-1>", self.select_crop)
+        # self.cropped_label_table.bind("<<TreeviewSelect>>", self.on_treeview_select)
 
         # self.add_cropped_label_btn.bind('<Return>', lambda event: self.verify_cropped_label_data())
         # self.window.focus_set()
@@ -528,7 +530,7 @@ class img_crop_label:
     # obtaining/verifying cropped label row data
 
     def verify_cropped_label_data(self):
-        cropped_label = [self.category_name_entry.get(), str(self.coordinates)]
+        cropped_label = [self.category_name_entry.get(), str(self.ratio_coordinates)]
 
         if (type(cropped_label[0]) == str) and (type(cropped_label[1]) == str) and type(ast.literal_eval(cropped_label[1])) in [list, tuple]:
 
@@ -537,11 +539,13 @@ class img_crop_label:
                 print('Data Updated')
                 print(cropped_label)
                 
-                self.crops_info[cropped_label[0]] = [self.current_crop, self.coordinates]
+                self.crops_info[cropped_label[0]] = [self.current_crop, self.ratio_coordinates]
+                print(self.crops_info)
                 tree_add_data(data=cropped_label, table=self.cropped_label_table)
 
                 self.category_name_entry.delete(0, END)
                 self.coordinates = None
+                self.ratio_coordinates = None
 
                 # Enable Crop Mode again
                 self.crop_mode = True
@@ -568,26 +572,41 @@ class img_crop_label:
 
         self.crops_info.clear()
 
+    def on_treeview_select(self, event):
+        selected_item = self.cropped_label_table.focus()
+        if selected_item:
+            category = self.cropped_label_table.item(selected_item, option="values")[0]
+
+        print(category)
+
 
     def select_crop(self, event):
-
         # Highlight Crop on Image
-        item = int(self.cropped_label_table.selection()[0][1:])
-        print(item)
-        print(self.crops_info)
-        if item == 1:
+        # item = int(self.cropped_label_table.selection()[0][1:])
+        selected_item = self.cropped_label_table.focus()
+        if selected_item:
+            category = self.cropped_label_table.item(selected_item, option="values")[0]
+
+        if category == '--':
             for r in self.crops_info.values():
                 self.image_visual.itemconfig(r[0], outline="lime")  # Reset all outlines
+                self.crop_not_found = self.canvas.create_image(
+                    559.0,
+                    226.0,
+                    image=self.image_image_5,
+                    tag=('crop_not_found')
+                )
                 self.cropped_image_visual.place_forget()
 
-        elif item <= len(list(self.crops_info.keys()))+1:
-            rect, _ = list(self.crops_info.values())[item-2]
+        elif category in list(self.crops_info.keys()):
+            rect, coords = self.crops_info[category]
             for r in self.crops_info.values():
                 self.image_visual.itemconfig(r[0], outline="lime")  # Reset all outlines
             self.image_visual.itemconfig(rect, outline="blue")   # Set selected outline to blue
 
             # Display Cropped Image on Preview
-            cropped_img, size = self.get_cropped_image()
+            self.canvas.delete("crop_not_found")
+            cropped_img, size = self.get_cropped_image(coords)
             resized_cropped_img, size = resize(cropped_img, target_width=244, target_height=130)
             tk_cropped_image = ImageTk.PhotoImage(resized_cropped_img)
 
@@ -613,16 +632,16 @@ class img_crop_label:
     # CROPPING FUNCTIONS
     # --------------------------------
     
-    def get_cropped_image(self):
-        if self.ratio_coordinates:
+    def get_cropped_image(self, coords):
+        if coords:
             with Image.open(self.current_image_path) as img:
                 image_width, image_height = img.size
 
                 # Calculate pixel coordinates
-                x1 = int(self.ratio_coordinates[0] * image_width)
-                y1 = int(self.ratio_coordinates[1] * image_height)
-                x2 = int(x1 + self.ratio_coordinates[2] * image_width)
-                y2 = int(y1 + self.ratio_coordinates[3] * image_height)
+                x1 = int(coords[0] * image_width)
+                y1 = int(coords[1] * image_height)
+                x2 = int(x1 + coords[2] * image_width)
+                y2 = int(y1 + coords[3] * image_height)
 
                 # Crop image
                 cropped_img = img.crop((x1, y1, x2, y2))
