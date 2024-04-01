@@ -333,7 +333,7 @@ class img_crop_label:
             image=self.button_image_9,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_9 clicked"),
+            command=self.delete_cropping,
             relief="flat"
         )
         self.delete_crop_btn.place(
@@ -727,6 +727,27 @@ class img_crop_label:
     def adjust_cropping(self):
         x1, y1, x2, y2 = self.coordinates
         self.image_visual.coords(self.current_crop, x1, y1, x2, y2)
+
+    def delete_cropping(self):
+        selected_item = self.cropped_label_table.focus()
+        if selected_item:
+            category = self.cropped_label_table.item(selected_item, option="values")[0]
+
+            if category != '--' and category in self.crops_info:
+                selected_crop = self.crops_info[category][0]
+                self.image_visual.delete(selected_crop)
+                self.cropped_label_table.delete(selected_item)  # Delete the selected row
+                self.cropped_image_visual.delete('all')
+                self.crop_not_found = self.canvas.create_image(
+                    559.0,
+                    226.0,
+                    image=self.image_image_5,
+                    tag=('crop_not_found')
+                )
+                self.cropped_image_visual.place_forget()
+                
+                del self.crops_info[category]
+
 
 
     # ------------------------
