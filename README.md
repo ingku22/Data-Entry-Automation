@@ -52,8 +52,9 @@ This project aims to create an application that allows new merchants to upload i
 
 ## Requirements
 
-To run this project, you will need to have the following modules
-(Additionally, do remember to have the google browser as the default and current browser)
+To run this project, you will need to have the following modules/clients
+
+`google browser > 115.00.00`
 
 `pillow == 10.2.0`
 
