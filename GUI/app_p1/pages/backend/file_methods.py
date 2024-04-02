@@ -37,6 +37,7 @@ def zip_n_download(staging_path):
 # --------------------------------     
 # IMAGE FILE FUNCTIONS
 # --------------------------------
+IMAGE_FILE_TYPES = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg']
 def select_file():
 
     file_path = filedialog.askopenfilename()
@@ -118,3 +119,39 @@ def archive_to_textbox(Textbox, file_path):
     Textbox.insert(tk.END, f'{file_path.split("/")[-1]}')
     if len(num_images) - 2 < 3:
         Textbox.insert(tk.END, '\n')
+
+
+# --------------------------------     
+# FOLDER FUNCTIONS
+# --------------------------------
+DIR_SPECIAL_FILES = ['txt', 'json']
+
+def select_folder():
+    folder_path = filedialog.askdirectory()
+    if folder_path:
+        print("Selected folder:", folder_path)
+
+    return folder_path
+
+    
+def obtain_folder_items(folder_path=None):
+
+    if not folder_path: # Select folder mode
+        folder_path = select_folder()
+
+    if folder_path:
+        directory_items = os.listdir(folder_path)
+        special_files = []
+        
+        # Check for any special files
+        for items in directory_items:
+            if items.split('.')[-1] in DIR_SPECIAL_FILES:
+                directory_items.remove(items)
+                special_files.append(items)
+
+        return directory_items, special_files
+    
+    else:
+        print('No folder selected.')
+
+    

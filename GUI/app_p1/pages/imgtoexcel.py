@@ -5,10 +5,10 @@
 
 from pathlib import Path
 
-# from tkinter import *
-# Explicit imports to satisfy Flake8
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Frame, BOTH
+from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Frame, BOTH, END, messagebox
 
+from backend.file_methods import obtain_folder_items
+from backend.table_methods import get_ttk_table, tree_add_data, tree_remove_all_data
 
 class imagetoexcel:
     def relative_to_assets(self, path: str) -> Path:
@@ -26,6 +26,12 @@ class imagetoexcel:
         self.ASSETS_PATH = BASE_PATH / ASSETS_REL_PATH
 
         self.window = Frame(root)
+
+        self.current_dirpath = None
+        self.current_img_items = None
+        self.current_spec_files = None
+        # self.content_path = jsonify # save ocr formatting as a json file?
+        self.file_name = None
 
 
         self.canvas = Canvas(
@@ -98,15 +104,14 @@ class imagetoexcel:
 
         self.button_image_1 = PhotoImage(
             file=self.relative_to_assets("button_1.png"))
-        self.button_1 = Button(
+        self.browse_folder_btn = Button(
             self.window,
             image=self.button_image_1,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_1 clicked"),
             relief="flat"
         )
-        self.button_1.place(
+        self.browse_folder_btn.place(
             x=75.0,
             y=222.0,
             width=131.0,
@@ -129,51 +134,34 @@ class imagetoexcel:
             image=self.image_image_4
         )
 
-        self.button_image_2 = PhotoImage(
-            file=self.relative_to_assets("button_2.png"))
-        self.button_2 = Button(
-            self.window,
-            image=self.button_image_2,
-            borderwidth=0,
-            highlightthickness=0,
-            command=lambda: print("button_2 clicked"),
-            relief="flat"
-        )
-        self.button_2.place(
-            x=98.0,
-            y=476.0,
-            width=168.0,
-            height=49.0
-        )
-
         self.button_image_3 = PhotoImage(
             file=self.relative_to_assets("button_3.png"))
-        self.button_3 = Button(
+        self.generate_btn = Button(
             self.window,
             image=self.button_image_3,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_3 clicked"),
             relief="flat"
         )
-        self.button_3.place(
+        self.generate_btn.place(
             x=98.0,
             y=476.0,
             width=168.0,
             height=49.0
         )
 
+        self.generate_btn.config(state='disabled')
+
         self.button_image_4 = PhotoImage(
             file=self.relative_to_assets("button_4.png"))
-        self.button_4 = Button(
+        self.clear_btn = Button(
             self.window,
             image=self.button_image_4,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_4 clicked"),
             relief="flat"
         )
-        self.button_4.place(
+        self.clear_btn.place(
             x=13.0,
             y=476.0,
             width=75.0,
@@ -182,15 +170,14 @@ class imagetoexcel:
 
         self.button_image_5 = PhotoImage(
             file=self.relative_to_assets("button_5.png"))
-        self.button_5 = Button(
+        self.prev_sheet_btn = Button(
             self.window,
             image=self.button_image_5,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_5 clicked"),
             relief="flat"
         )
-        self.button_5.place(
+        self.prev_sheet_btn.place(
             x=407.0,
             y=83.0,
             width=20.0,
@@ -199,15 +186,14 @@ class imagetoexcel:
 
         self.button_image_6 = PhotoImage(
             file=self.relative_to_assets("button_6.png"))
-        self.button_6 = Button(
+        self.next_sheet_btn = Button(
             self.window,
             image=self.button_image_6,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_6 clicked"),
             relief="flat"
         )
-        self.button_6.place(
+        self.next_sheet_btn.place(
             x=555.0,
             y=83.0,
             width=20.0,
@@ -247,14 +233,14 @@ class imagetoexcel:
             458.5,
             image=self.entry_image_1
         )
-        self.entry_1 = Text(
+        self.excel_stat = Text(
             self.window,
             bd=0,
             bg="#8D8D8D",
             fg="#000716",
             highlightthickness=0
         )
-        self.entry_1.place(
+        self.excel_stat.place(
             x=320.0,
             y=389.0,
             width=146.0,
@@ -277,14 +263,14 @@ class imagetoexcel:
             457.5,
             image=self.entry_image_2
         )
-        self.entry_2 = Entry(
+        self.file_name_entry = Entry(
             self.window,
             bd=0,
             bg="#FFFFFF",
             fg="#000716",
             highlightthickness=0
         )
-        self.entry_2.place(
+        self.file_name_entry.place(
             x=500.0,
             y=445.0,
             width=158.0,
@@ -293,15 +279,14 @@ class imagetoexcel:
 
         self.button_image_7 = PhotoImage(
             file=self.relative_to_assets("button_7.png"))
-        self.button_7 = Button(
+        self.delete_excel_btn = Button(
             self.window,
             image=self.button_image_7,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_7 clicked"),
             relief="flat"
         )
-        self.button_7.place(
+        self.delete_excel_btn.place(
             x=490.0,
             y=479.0,
             width=52.0,
@@ -310,20 +295,21 @@ class imagetoexcel:
 
         self.button_image_8 = PhotoImage(
             file=self.relative_to_assets("button_8.png"))
-        self.button_8 = Button(
+        self.download_btn = Button(
             self.window,
             image=self.button_image_8,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_8 clicked"),
             relief="flat"
         )
-        self.button_8.place(
+        self.download_btn.place(
             x=550.0,
             y=480.0,
             width=118.0,
             height=45.0
         )
+
+        self.download_btn.config(state='disabled')
 
         self.image_image_6 = PhotoImage(
             file=self.relative_to_assets("image_6.png"))
@@ -358,6 +344,95 @@ class imagetoexcel:
             font=("Inter Bold", 15 * -1)
         )
 
+        self.init_button_commands()
+
+    # ============================== DIRECT BACKEND ===============================
+    # init functions
+    def init_button_commands(self):
+        self.browse_folder_btn.config(command=self.display_dir_table)
+        self.clear_btn.config(command=self.clear_dir_table)
+        self.generate_btn.config(command=self.generate_excel)
+        self.delete_excel_btn.config(command=self.remove_excel)
+        self.download_btn.config(command=self.download_excel)
+
+    # Directory Functions
+    def display_dir_table(self):
+        self.current_img_items, self.current_spec_files = obtain_folder_items()
+        print(f'Directory Items: {self.current_img_items}')
+        print(f'Special Files: {self.current_spec_files}')
+        
+        self.crop_table = get_ttk_table(root=self.window , width=252, 
+                                        column=['IMAGE', 'CATEGORY', 'SPECS'], 
+                                        data=[['burgerkng_1', 'burger', '(1,2,3,4)'], 
+                                              ['burgerkng_1', 'sides', '(1,2,3,4)'],
+                                              ['burgerkng_1', 'beverages', '(1,2,3,4)'],
+                                              ['burgerkng_2', 'set meals', '(1,2,3,4)']
+                                            ]
+                                        )
+        self.crop_table.place(
+            x=14.0,
+            y=98.0,
+            height=190
+        )
+
+        self.generate_btn.config(state='normal')
+    
+    def clear_dir_table(self):
+        self.crop_table.place_forget()
+        self.current_spec_files = None
+        self.current_img_items = None
+        self.generate_btn.config(state='disabled')
+
+        print('table cleared!')
+
+    # Excel Function
+    # Methodology (per image in images):
+    # get image path -> ocr -> ocr sorting -> transfer into dataframe -> transfer into treeview -> display treeview
+    def generate_excel(self):
+        print('Generating Excel File')
+
+        # transfer into treeview
+        self.excel_preview_table = get_ttk_table(root=self.window, width=380)
+        self.excel_preview_table.place(
+            x=300.0, # +4
+            y=107.5, # +32
+            height=245
+        )
+
+        # show statistics of the treeview
+        DUMMY_STATS_DATA = '\nGENERATED REPORT\n=================\nCategory: 4\nMenu Items: 12\nOption grp: 3\nOptions: 10\n\nFile Size: 4KB'
+        
+        self.excel_stat.delete(1.0, END)
+        self.excel_stat.insert(END, DUMMY_STATS_DATA)
+        self.excel_stat.config(state='disabled')
+        self.download_btn.config(state='normal')
+
+    def remove_excel(self):
+        print('Excel Removed.')
+        self.excel_preview_table.place_forget()
+        self.excel_stat.config(state='normal')
+        self.excel_stat.delete(1.0, END)
+
+        self.file_name_entry.delete(0, END)
+        self.download_btn.config(state='disabled')
+
+
+    def download_excel(self):
+        set_file_name = self.file_name_entry.get().lstrip().rstrip()
+
+        # Check for missing values
+        if set_file_name not in ['', None]:
+            # download the file
+            self.excel_name = set_file_name
+            print(f'File Name: {self.excel_name}')
+
+        else:
+            messagebox.showerror(title='DataFormatError',
+                                    message='Please name your excel file.')
+
+
+        
+    # Page Functions
     def run(self):
         self.window.resizable(False, False)
         self.window.mainloop()

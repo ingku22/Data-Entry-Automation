@@ -5,10 +5,9 @@
 # Imports
 # ---------------------------
 from pathlib import Path
-import time
+
 import tkinter as tk
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Frame, BOTH
-from PIL import Image, ImageTk
 
 # Backend imports
 from backend.file_methods import select_file, display_select_file, archive_to_textbox
