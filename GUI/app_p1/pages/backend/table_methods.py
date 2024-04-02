@@ -31,8 +31,13 @@ def get_ttk_table(root, width=70, column=DEFAULT_COLUMN, data=DEFAULT_DATA, yscr
         table.column(column=each_column, width=int(width/len(column)))
 
     for row_data in data:
+<<<<<<< HEAD
         print(row_data)
         table.insert(parent='', index='end', value=tuple(row_data))
+=======
+        table.insert(parent='', index='end', value=row_data)
+        
+>>>>>>> e504a6e548e7a3cddab478d7abff4c1d85fb335a
 
     return table
 
@@ -45,7 +50,7 @@ def tree_add_data(data:list, table, no_null_allowed=True):
                                message='There seems to be a null value in the form. Please ensure all necessary rows are filled up.')
     else:
         try:
-            table.insert(parent='', index='end', value=data)
+            table.insert(parent='', index='end', value=data, )
         except:
             messagebox.showerror(title='PostError',
                                  message='The form you have tried to submit is not compatible with the system.')

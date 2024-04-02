@@ -1,6 +1,10 @@
 from tkinter import filedialog, messagebox
 import tkinter as tk
 from PIL import Image, ImageTk
+
+import os
+import shutil
+import zipfile
 from pathlib import Path
 
 
@@ -13,18 +17,28 @@ SUPPORTED_FILE_TYPES = ['png', 'jpg', 'jpeg']
 
 
 # --------------------------------     
+# ZIP FILE FUNCTIONS
+# --------------------------------
+def zip_n_download(staging_path):
+    # Create a zip file
+    zip_filename = "staging.zip"
+    with zipfile.ZipFile(zip_filename, 'w') as zipf:
+        # Add all files and directories in the staging folder to the zip file
+        for root, dirs, files in os.walk(staging_path):
+            for file in files:
+                file_path = Path(root) / file
+                zipf.write(file_path, file_path.relative_to(staging_path))
+
+    # Move the zip file to the user's Downloads directory
+    downloads_path = Path.home() / "Downloads"
+    shutil.move(zip_filename, downloads_path / zip_filename)
+    print(f"Zip file saved to: {downloads_path / zip_filename}")
+
+# --------------------------------     
 # IMAGE FILE FUNCTIONS
 # --------------------------------
+IMAGE_FILE_TYPES = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg']
 def select_file():
-
-    # content = Textbox.get(1.0, tk.END)
-
-    # # Check if there is 3 images
-    # num_images = content.split('\n')
-    # if len(num_images) - 2 >= 3:
-    #     print(num_images)
-    #     messagebox.showerror(title='OverloadError',
-    #                          message='This application currently only supports 3 images per run due to the processing time.')
 
     file_path = filedialog.askopenfilename()
 
@@ -105,3 +119,39 @@ def archive_to_textbox(Textbox, file_path):
     Textbox.insert(tk.END, f'{file_path.split("/")[-1]}')
     if len(num_images) - 2 < 3:
         Textbox.insert(tk.END, '\n')
+
+
+# --------------------------------     
+# FOLDER FUNCTIONS
+# --------------------------------
+DIR_SPECIAL_FILES = ['txt', 'json']
+
+def select_folder():
+    folder_path = filedialog.askdirectory()
+    if folder_path:
+        print("Selected folder:", folder_path)
+
+    return folder_path
+
+    
+def obtain_folder_items(folder_path=None):
+
+    if not folder_path: # Select folder mode
+        folder_path = select_folder()
+
+    if folder_path:
+        directory_items = os.listdir(folder_path)
+        special_files = []
+        
+        # Check for any special files
+        for items in directory_items:
+            if items.split('.')[-1] in DIR_SPECIAL_FILES:
+                directory_items.remove(items)
+                special_files.append(items)
+
+        return directory_items, special_files
+    
+    else:
+        print('No folder selected.')
+
+    
