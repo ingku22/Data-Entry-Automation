@@ -7,7 +7,10 @@ from pathlib import Path
 
 # from tkinter import *
 # Explicit imports to satisfy Flake8
-from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+import pandas as pd
+from tkinter import ttk, Tk, Canvas, Entry, Text, Button, PhotoImage, Frame
+from backend.automationprocess import automation_process
+from backend.table_methods import get_ttk_table
 
 
 BASE_PATH = Path(__file__).resolve().parent.parent
@@ -21,13 +24,28 @@ ASSETS_PATH = BASE_PATH / ASSETS_REL_PATH
 
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
-
-
 window = Tk()
 
 window.geometry("700x550")
 window.configure(bg = "#FFFFFF")
 
+excelPath = "Automation Data\Prototype_v2.2.xlsx"
+sheetNo = 0
+excel_file = pd.ExcelFile(excelPath)
+num_of_sheets = len(excel_file.sheet_names)
+currentSheet = pd.read_excel(excelPath, sheet_name=sheetNo)
+excelHeaders = tuple(currentSheet.columns.values)
+
+def changeSheet(adj):
+    global sheetNo 
+    global currentSheet
+    global excelHeaders
+    if sheetNo + adj >= 0 and sheetNo + adj < num_of_sheets:
+        sheetNo += adj
+        currentSheet = pd.read_excel(excelPath, sheet_name=sheetNo)
+        excelHeaders = tuple(currentSheet.columns.values)
+        canvas.itemconfig(label, text=f'{excel_file.sheet_names[sheetNo]:^40}')
+        loadSheet()
 
 canvas = Canvas(
     window,
@@ -38,6 +56,42 @@ canvas = Canvas(
     highlightthickness = 0,
     relief = "ridge"
 )
+
+def loadSheet():
+    # Create a Frame to hold the Treeview and Scrollbar
+    frame = Frame(canvas)
+    frame.place(x=255, y=350, width=400, height=155)
+
+    # Create a TreeView widget
+    treeview = ttk.Treeview(frame)
+
+    # Define some columns
+    treeview["columns"] = excelHeaders
+    treeview.column("#0", minwidth=0, width=0)
+
+    for header in excelHeaders:
+        treeview.heading(header, text=header)
+        treeview.column(header, minwidth=0, width=int(400/len(excelHeaders)))
+
+    for values in currentSheet.values:
+        treeview.insert("", "end", values=tuple(values))
+
+    # Create a vertical scrollbar
+    vertscrollbar = ttk.Scrollbar(frame, orient="vertical", command=treeview.yview)
+    vertscrollbar.pack(side="right", fill="y")
+
+    # Create a horizontal scrollbar
+    horscrollbar = ttk.Scrollbar(frame, orient="horizontal", command=treeview.xview)
+    horscrollbar.pack(side="top", fill="x")
+
+    # Pack the TreeView widget with the scrollbar
+    treeview.pack(side="left", fill="y", expand=True)
+
+    # Configure the TreeView to use the scrollbar
+    treeview.configure(yscrollcommand=vertscrollbar.set)
+    treeview.configure(xscrollcommand=horscrollbar.set)
+
+loadSheet()
 
 canvas.place(x = 0, y = 0)
 canvas.create_rectangle(
@@ -103,7 +157,7 @@ automate_btn = Button(
     image=button_image_1,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("button_1 clicked"),
+    command=lambda: automation_process(),
     relief="flat"
 )
 automate_btn.place(
@@ -167,7 +221,7 @@ prev_sheet_btn = Button(
     image=button_image_4,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("button_4 clicked"),
+    command=lambda: changeSheet(-1),
     relief="flat"
 )
 prev_sheet_btn.place(
@@ -183,7 +237,7 @@ next_sheet_btn = Button(
     image=button_image_5,
     borderwidth=0,
     highlightthickness=0,
-    command=lambda: print("button_5 clicked"),
+    command=lambda: changeSheet(1),
     relief="flat"
 )
 next_sheet_btn.place(
@@ -193,22 +247,34 @@ next_sheet_btn.place(
     height=20.0
 )
 
-canvas.create_text(
+label = canvas.create_text(
     382.0,
     306.0,
     anchor="nw",
-    text="Sheet 1",
+    text='',
     fill="#FFFFFF",
     font=("Inter Bold", 12 * -1)
 )
 
-image_image_4 = PhotoImage(
-    file=relative_to_assets("image_4.png"))
-image_4 = canvas.create_image(
-    460.0,
-    412.0,
-    image=image_image_4
-)
+
+# excelDisplay = canvas.create_text(
+#     350.0,
+#     412.0,
+#     anchor="nw",
+#     text=currentSheet,
+#     fill="#FFFFFF",
+#     font=("Inter Bold", 12 * -1)
+# )
+
+
+
+# image_image_4 = PhotoImage(
+#     file=relative_to_assets("image_4.png"))
+# image_4 = canvas.create_image(
+#     460.0,
+#     412.0,
+#     image=image_image_4
+# )
 
 button_image_6 = PhotoImage(
     file=relative_to_assets("button_6.png"))

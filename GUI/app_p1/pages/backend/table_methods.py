@@ -23,7 +23,7 @@ LABEL_DATA = [
 # table methods
 
 # Configure Table Data into ttk.Treeview
-def get_ttk_table(root, width=70, column=DEFAULT_COLUMN, data=DEFAULT_DATA, yscroll=False):
+def get_ttk_table(root, width=70, column=DEFAULT_COLUMN, data=DEFAULT_DATA, yscroll=False, xscroll=False):
     table = ttk.Treeview(master=root, columns=column, show='headings')
      
     for each_column in column:
@@ -31,8 +31,13 @@ def get_ttk_table(root, width=70, column=DEFAULT_COLUMN, data=DEFAULT_DATA, yscr
         table.column(column=each_column, width=int(width/len(column)))
 
     for row_data in data:
+<<<<<<< HEAD
+        print(row_data)
+        table.insert(parent='', index='end', value=tuple(row_data))
+=======
         table.insert(parent='', index='end', value=row_data)
         
+>>>>>>> e504a6e548e7a3cddab478d7abff4c1d85fb335a
 
     return table
 
