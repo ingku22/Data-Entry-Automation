@@ -14,7 +14,9 @@ from selenium.webdriver.support.ui import Select
 
 def automation_process():
 
-    excelPath = "Prototype.xlsx"    
+    print("Running...")
+
+    excelPath = "Automation Data\Prototype_v2.2.xlsx"    
 
     menuDF = pd.read_excel(excelPath, sheet_name=0)
     menuDF = menuDF[menuDF["ItemID"].notna()]
@@ -209,30 +211,3 @@ def automation_process():
         optionGrpBackBtn = driver.find_element(By.XPATH, optionGrpBackBtnXPath)
         wait.until(lambda d: optionGrpBackBtn.is_displayed())
         optionGrpBackBtn.click()
-
-        
-
-        
-automation_process()
-
-
-            
-            
-
-
-
-
-        
-
-
-
-
-
-    
-
-
-    
-
-
-
-
