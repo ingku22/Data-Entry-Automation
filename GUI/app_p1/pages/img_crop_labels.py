@@ -579,6 +579,15 @@ class img_crop_label:
         for rect in self.crops_info.values():
             self.image_visual.delete(rect[0])
 
+        self.crop_not_found = self.canvas.create_image(
+            559.0,
+            226.0,
+            image=self.image_image_5,
+            tag=('crop_not_found')
+        )
+        
+        self.cropped_image_visual.place_forget()
+
         self.crops_info.clear()
 
     def on_treeview_select(self, event):
