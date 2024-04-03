@@ -20,7 +20,7 @@ class imagetoexcel:
         BASE_PATH = Path(__file__).resolve().parent.parent
 
         # Define the relative path to the assets directory
-        ASSETS_REL_PATH = Path("assets/frame0a")
+        ASSETS_REL_PATH = Path("assets/frame0")
 
         # Define the absolute path to the assets directory
         self.ASSETS_PATH = BASE_PATH / ASSETS_REL_PATH

@@ -2,7 +2,6 @@ import tkinter as tk
 import random
 
 # Pages
-from img2excel import image2excel
 from img_crop_labels import img_crop_label
 from imgtoexcel import imagetoexcel
 
@@ -42,8 +41,7 @@ class PaginationApp:
             self.pages[item] = frame
 
         # Actual Pages
-        self.pages['Image to Excel Reader'] = image2excel(self.root)
-        self.pages['Image to Excel Reader +'] = imagetoexcel(self.root)
+        self.pages['Image to Excel Reader'] = imagetoexcel(self.root)
         self.pages['Crop Toolkit and Viewer'] = img_crop_label(self.root)
         
         # print(f'Pages Created: {list(self.pages.keys())}')
@@ -77,7 +75,6 @@ class PaginationApp:
         menu_bar.add_cascade(label="Automation Toolkits", menu=toolkits_menu)
 
         toolkits_menu.add_command(label="Image to Excel Reader", command=lambda: self.show_page("Image to Excel Reader"))
-        toolkits_menu.add_command(label="Image to Excel Reader +", command=lambda: self.show_page("Image to Excel Reader +"))
 
         cropping_menu = tk.Menu(toolkits_menu, tearoff=0)
         toolkits_menu.add_cascade(label="Category Cropping Toolkit", menu=cropping_menu)
