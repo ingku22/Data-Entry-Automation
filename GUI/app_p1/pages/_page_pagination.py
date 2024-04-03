@@ -4,6 +4,7 @@ import random
 # Pages
 from img_crop_labels import img_crop_label
 from imgtoexcel import imagetoexcel
+from automation import automation
 
 class PaginationApp:
     def __init__(self, root):
@@ -43,6 +44,7 @@ class PaginationApp:
         # Actual Pages
         self.pages['Image to Excel Reader'] = imagetoexcel(self.root)
         self.pages['Crop Toolkit and Viewer'] = img_crop_label(self.root)
+        self.pages['Merchant Onboarding'] = automation(self.root)
         
         # print(f'Pages Created: {list(self.pages.keys())}')
 
