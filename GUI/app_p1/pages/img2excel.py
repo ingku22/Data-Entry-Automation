@@ -104,7 +104,6 @@ class image2excel:
             fill="#1E2BA3",
             font=("Arial", 10)
         )
-
         self.canvas.create_text(
             467.0,
             334.0,

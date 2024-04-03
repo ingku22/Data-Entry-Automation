@@ -213,8 +213,8 @@ class imagetoexcel:
             84.0,
             anchor="nw",
             text="Sheet 1",
-            fill="#FFFFFF",
-            font=("Inter Bold", 14 * -1)
+            fill="#000000",
+            font=("Arial", 10)
         )
 
         self.canvas.create_text(
@@ -223,7 +223,7 @@ class imagetoexcel:
             anchor="nw",
             text="Export Excel ",
             fill="#1E2BA3",
-            font=("Inter Bold", 16 * -1)
+            font=("Arial", 12)
         )
 
         self.entry_image_1 = PhotoImage(
@@ -253,7 +253,7 @@ class imagetoexcel:
             anchor="nw",
             text="File Name",
             fill="#1E2BA3",
-            font=("Inter Bold", 12 * -1)
+            font=("Arial", 10)
         )
 
         self.entry_image_2 = PhotoImage(
@@ -311,37 +311,21 @@ class imagetoexcel:
 
         self.download_btn.config(state='disabled')
 
-        self.image_image_6 = PhotoImage(
-            file=self.relative_to_assets("image_6.png"))
-        self.image_6 = self.canvas.create_image(
+        self.status_image = PhotoImage(
+            file=self.relative_to_assets("image_7.png"))
+        self.format_status = self.canvas.create_image(
             203.0,
             85.0,
-            image=self.image_image_6
+            image=self.status_image
         )
-
-        # self.image_image_7 = PhotoImage(
-        #     file=self.relative_to_assets("image_7.png"))
-        # self.image_7 = self.canvas.create_image(
-        #     203.0,
-        #     272.0,
-        #     image=self.image_image_7
-        # )
-
-        # self.image_image_8 = PhotoImage(
-        #     file=self.relative_to_assets("image_8.png"))
-        # self.image_8 = self.canvas.create_image(
-        #     77.0,
-        #     272.0,
-        #     image=self.image_image_8
-        # )
 
         self.canvas.create_text(
             21.0,
-            79.0,
+            74.0,
             anchor="nw",
             text="Images",
             fill="#8F8F8F",
-            font=("Inter Bold", 15 * -1)
+            font=("Arial", 14)
         )
 
         self.init_button_commands()
@@ -360,28 +344,41 @@ class imagetoexcel:
         self.current_img_items, self.current_spec_files = obtain_folder_items()
         print(f'Directory Items: {self.current_img_items}')
         print(f'Special Files: {self.current_spec_files}')
-        
-        self.crop_table = get_ttk_table(root=self.window , width=252, 
-                                        column=['IMAGE', 'CATEGORY', 'SPECS'], 
-                                        data=[['burgerkng_1', 'burger', '(1,2,3,4)'], 
-                                              ['burgerkng_1', 'sides', '(1,2,3,4)'],
-                                              ['burgerkng_1', 'beverages', '(1,2,3,4)'],
-                                              ['burgerkng_2', 'set meals', '(1,2,3,4)']
-                                            ]
-                                        )
-        self.crop_table.place(
-            x=14.0,
-            y=98.0,
-            height=190
-        )
 
-        self.generate_btn.config(state='normal')
+        # Check if the format is right:
+        if 'label.txt' not in self.current_spec_files:
+            self.status_image = PhotoImage(file=self.relative_to_assets('image_8.png'))
+            self.canvas.itemconfig(self.format_status, image=self.status_image)
+        
+        else:
+            self.status_image = PhotoImage(file=self.relative_to_assets('image_6.png'))
+            self.canvas.itemconfig(self.format_status, image=self.status_image)
+        
+            self.crop_table = get_ttk_table(root=self.window , width=252, 
+                                            column=['IMAGE', 'CATEGORY', 'SPECS'], 
+                                            data=[['burgerkng_1', 'burger', '(1,2,3,4)'], 
+                                                ['burgerkng_1', 'sides', '(1,2,3,4)'],
+                                                ['burgerkng_1', 'beverages', '(1,2,3,4)'],
+                                                ['burgerkng_2', 'set meals', '(1,2,3,4)']
+                                                ]
+                                            )
+            self.crop_table.place(
+                x=14.0,
+                y=98.0,
+                height=190
+            )
+
+            self.generate_btn.config(state='normal')
     
     def clear_dir_table(self):
         self.crop_table.place_forget()
         self.current_spec_files = None
         self.current_img_items = None
         self.generate_btn.config(state='disabled')
+
+        # Set the format status to be detecting
+        self.status_image = PhotoImage(file=self.relative_to_assets('image_7.png'))
+        self.canvas.itemconfig(self.format_status, image=self.status_image)
 
         print('table cleared!')
 
@@ -394,8 +391,8 @@ class imagetoexcel:
         # transfer into treeview
         self.excel_preview_table = get_ttk_table(root=self.window, width=380)
         self.excel_preview_table.place(
-            x=300.0, # +4
-            y=107.5, # +32
+            x=300.0,
+            y=107.5,
             height=245
         )
 
