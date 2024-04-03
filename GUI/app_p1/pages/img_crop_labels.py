@@ -7,8 +7,8 @@ from pathlib import Path
 import ast
 from PIL import Image, ImageTk
 
-from tkinter import Tk, ttk, messagebox, Canvas, Entry, Text, Button, PhotoImage, Frame
-from tkinter import BOTH, END
+from tkinter import Tk, ttk, messagebox, Canvas, Entry, Text, Button, PhotoImage, Frame, Radiobutton
+from tkinter import BOTH, END, LEFT, StringVar
 from idlelib.tooltip import Hovertip
 from backend.table_methods import get_ttk_table, tree_add_data, tree_remove_all_data
 # from backend.data_methods import
@@ -33,6 +33,7 @@ class img_crop_label:
 
         self.window = Frame(root)
         self.crop_mode = False
+        self.crop_type = StringVar(value="Items")
 
         self.current_image = None # PhotoImage Tk
         self.current_image_ref = None # PIL Image (Cropping Reference)
@@ -101,13 +102,13 @@ class img_crop_label:
             image=self.image_image_2
         )
 
-        self.canvas.create_text(
+        self.crop_type_text = self.canvas.create_text(
             25.0,
             467.0,
             anchor="nw",
             text="Category Name",
             fill="#1E2BA3",
-            font=("Arial", 10)
+            font=("Arial", 11)
         )
 
         self.entry_image_1 = PhotoImage(
@@ -197,7 +198,7 @@ class img_crop_label:
             anchor="nw",
             text="Confirm Cropped Label",
             fill="#1E2BA3",
-            font=("Arial", 12)
+            font=("Arial", 14)
         )
 
         self.canvas.create_rectangle(
@@ -476,6 +477,26 @@ class img_crop_label:
 
         self.remove_img_tip = Hovertip(self.remove_img_btn,
                                      'Button to remove images.\nImage will be removed along with the table data.', hover_delay=10)
+        
+
+        # Create a frame to hold the radio buttons
+        self.crop_type_frame = Frame(self.window, bg='blue')  # Set the width of the frame
+
+        # Create and pack the radio buttons with padding
+        option1_button = Radiobutton(self.crop_type_frame, text="Menu Item", variable=self.crop_type, value="Items", padx=5, 
+                                        font=('Arial', 11), bg='#D9D9D9',
+                                        command=self.change_crop_type)  # Add padding to the left and right
+        option1_button.pack(side=LEFT)
+
+        option2_button = Radiobutton(self.crop_type_frame, text="Option Group", variable=self.crop_type, value="Options", padx=5, 
+                                        font=('Arial', 11), bg='#D9D9D9',
+                                        command=self.change_crop_type)  # Add padding to the left and right
+        option2_button.pack(side=LEFT)
+
+        self.crop_type_frame.place(
+            x=25.0,
+            y=500.0
+        )
 
         self.init_button_commands()
 
@@ -523,6 +544,15 @@ class img_crop_label:
 
         # self.add_cropped_label_btn.bind('<Return>', lambda event: self.verify_cropped_label_data())
         # self.window.focus_set()
+
+    def change_crop_type(self):
+        if self.crop_type.get() == 'Items':
+            print('Cropping for Menu Items.')
+            self.canvas.itemconfig(self.crop_type_text, text='Category Name')
+
+        elif self.crop_type.get() == 'Options':
+            print('Cropping for Option Groups.')
+            self.canvas.itemconfig(self.crop_type_text, text='Option Group')
 
 
     # Save Cropped Images
@@ -585,7 +615,7 @@ class img_crop_label:
             image=self.image_image_5,
             tag=('crop_not_found')
         )
-        
+
         self.cropped_image_visual.place_forget()
 
         self.crops_info.clear()
