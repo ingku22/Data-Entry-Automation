@@ -240,7 +240,6 @@ class img_crop_label:
             image=self.button_image_4,
             borderwidth=0,
             highlightthickness=0,
-            command=self.saved_cropped_img,
             relief="flat"
         )
         self.download_folder_btn.place(
@@ -498,6 +497,23 @@ class img_crop_label:
             y=500.0
         )
 
+        self.button_image_13 = PhotoImage(
+            file=self.relative_to_assets("button_13.png"))
+        self.stage_crops_btn = Button(
+            self.window,
+            image=self.button_image_13,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: print("button_13 clicked"),
+            relief="flat"
+        )
+        self.stage_crops_btn.place(
+            x=578.0,
+            y=323.0,
+            width=107.0,
+            height=18.0
+        )
+
         self.init_button_commands()
 
     # ======================= BACKEND ======================
@@ -537,6 +553,9 @@ class img_crop_label:
         self.button_10.config(command=self.display_original_img)
         self.remove_img_btn.config(command=self.remove_original_img)
         self.add_cropped_label_btn.config(command=self.verify_cropped_label_data)
+
+        self.download_folder_btn.config(command=lambda dwnld=True: self.saved_cropped_img(download=dwnld))
+        self.stage_crops_btn.config(command=self.saved_cropped_img)
         
         self.clear_all_btn.config(command=self.clear_all_label_data)
         self.cropped_label_table.bind("<ButtonRelease-1>", self.select_crop)
@@ -556,15 +575,27 @@ class img_crop_label:
 
 
     # Save Cropped Images
-    def saved_cropped_img(self):
+    def saved_cropped_img(self, download=False):
+        string_info = 'Items saved into staging folder:\n'
+
         for category, crop_stats in self.crops_info.items():
             _, coords = crop_stats
             cropped_img, _ = self.get_cropped_image(coords)
             cropped_img.save(self.STAGING_PATH / f'{category}.jpg')
 
-            print(f'category {category} saved into staging folder')
+            string_info += f'\n{category}.jpg'
 
-        zip_n_download(self.STAGING_PATH)
+        messagebox.showinfo(
+            title='SaveInfo',
+            message=string_info
+        )
+
+        if download:
+            zip_n_download(self.STAGING_PATH)
+            messagebox.showinfo(
+                title='SaveInfo',
+                message='Staging Folder has been downloaded!'
+            )
 
     # obtaining/verifying cropped label row data
 
@@ -801,7 +832,6 @@ class img_crop_label:
 
     def pack_forget(self):
         self.window.pack_forget()
-        self.window.unbind_all()
 
 
 
