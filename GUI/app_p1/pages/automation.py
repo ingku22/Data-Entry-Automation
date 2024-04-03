@@ -5,9 +5,10 @@ from pathlib import Path
 # from tkinter import *
 # Explicit imports to satisfy Flake8
 import pandas as pd
-from tkinter import ttk, Tk, Canvas, Button, PhotoImage, Frame, filedialog, BOTH
+from tkinter import ttk, Tk, Canvas, Button, PhotoImage, Frame, filedialog, BOTH, Label
 from backend.automationprocess import automation_process
 from backend.excel_methods import ExcelHandler
+from backend.display_methods import hideElement, showElement 
 
 excel_handler = ExcelHandler()
 
@@ -137,7 +138,9 @@ class automation:
             image=self.button_image_3,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: excel_handler.uploadExcel(self.canvas, self.label, self.automate_btn),
+            command=lambda: excel_handler.uploadExcel({"canvas": self.canvas, "label": self.label, "automateBtn": self.automate_btn, 
+                                                       "uploadImg": self.image_2, "uploadBtn": self.button_3, "deleteBtn": self.delete_excel_btn,
+                                                       "verifyBtn": self.verify_btn}),
             relief="flat"
         )
         self.button_3.place(
@@ -145,7 +148,7 @@ class automation:
             y=449.0,
             width=128.0,
             height=32.0
-        )
+        )   
 
         self.image_image_2 = PhotoImage(
             file=self.relative_to_assets("image_2.png"))
@@ -154,6 +157,7 @@ class automation:
             374.0,
             image=self.image_image_2
         )
+  
 
         self.image_image_3 = PhotoImage(
             file=self.relative_to_assets("image_3.png"))
@@ -208,15 +212,6 @@ class automation:
         )
 
 
-        # self.excelDisplay = self.canvas.create_text(
-        #     350.0,
-        #     412.0,
-        #     anchor="nw",
-        #     text=currentSheet,
-        #     fill="#FFFFFF",
-        #     font=("Inter Bold", 12 * -1)
-        # )
-
 
 
         self.image_image_4 = PhotoImage(
@@ -234,15 +229,11 @@ class automation:
             image=self.button_image_6,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_6 clicked"),
+            command=lambda: excel_handler.deleteSheet({"canvas": self.canvas, "label": self.label, "automateBtn": self.automate_btn, 
+                                                       "uploadImg": self.image_2, "uploadBtn": self.button_3, "deleteBtn": self.delete_excel_btn,
+                                                       "verifyBtn": self.verify_btn}),
             relief="flat"
         )
-        # self.delete_excel_btn.place(
-        #     x=258.0,
-        #     y=467.0,
-        #     width=80.0,
-        #     height=38.0
-        # )
 
         self.button_image_8 = PhotoImage(
             file=self.relative_to_assets("button_8.png"))
@@ -254,12 +245,8 @@ class automation:
             command=lambda: print("button_8 clicked"),
             relief="flat"
         )
-        # self.verify_btn.place(
-        #     x=345.0,
-        #     y=467.0,
-        #     width=80.0,
-        #     height=38.0
-        # )
+       
+        
 
         self.button_image_9 = PhotoImage(
             file=self.relative_to_assets("button_9.png"))
@@ -277,6 +264,9 @@ class automation:
         #     width=80.0,
         #     height=38.0
         # )
+
+    # Excel Local Functions
+
 
     # Page Functions
     def run(self):
