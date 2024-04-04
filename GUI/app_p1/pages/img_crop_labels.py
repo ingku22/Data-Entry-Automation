@@ -653,12 +653,12 @@ class img_crop_label:
 
         self.crops_info.clear()
 
-    def on_treeview_select(self, event):
-        selected_item = self.cropped_label_table.focus()
-        if selected_item:
-            category = self.cropped_label_table.item(selected_item, option="values")[0]
+    # def on_treeview_select(self, event):
+    #     selected_item = self.cropped_label_table.focus()
+    #     if selected_item:
+    #         category = self.cropped_label_table.item(selected_item, option="values")[0]
 
-        print(category)
+    #     print(category)
 
 
     def select_crop(self, event):
