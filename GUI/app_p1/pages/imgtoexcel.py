@@ -342,33 +342,40 @@ class imagetoexcel:
     # Directory Functions
     def display_dir_table(self):
         self.current_img_items, self.current_spec_files = obtain_folder_items()
-        print(f'Directory Items: {self.current_img_items}')
-        print(f'Special Files: {self.current_spec_files}')
 
-        # Check if the format is right:
-        if 'label.txt' not in self.current_spec_files:
-            self.status_image = PhotoImage(file=self.relative_to_assets('image_8.png'))
-            self.canvas.itemconfig(self.format_status, image=self.status_image)
-        
-        else:
-            self.status_image = PhotoImage(file=self.relative_to_assets('image_6.png'))
-            self.canvas.itemconfig(self.format_status, image=self.status_image)
-        
-            self.crop_table = get_ttk_table(root=self.window , width=252, 
-                                            column=['IMAGE', 'CATEGORY', 'SPECS'], 
-                                            data=[['burgerkng_1', 'burger', '(1,2,3,4)'], 
-                                                ['burgerkng_1', 'sides', '(1,2,3,4)'],
-                                                ['burgerkng_1', 'beverages', '(1,2,3,4)'],
-                                                ['burgerkng_2', 'set meals', '(1,2,3,4)']
-                                                ]
-                                            )
-            self.crop_table.place(
-                x=14.0,
-                y=98.0,
-                height=190
-            )
+        if self.current_img_items and self.current_spec_files:
+            print(f'Directory Items: {self.current_img_items}')
+            print(f'Special Files: {self.current_spec_files}')
 
-            self.generate_btn.config(state='normal')
+            # Check if the format is right:
+            if 'label.txt' not in self.current_spec_files:
+                self.status_image = PhotoImage(file=self.relative_to_assets('image_8.png'))
+                self.canvas.itemconfig(self.format_status, image=self.status_image)
+            
+            else:
+                self.status_image = PhotoImage(file=self.relative_to_assets('image_6.png'))
+                self.canvas.itemconfig(self.format_status, image=self.status_image)
+
+                # Get data
+                self.crops_info = {} # image: [type, group name (crop label), specs]
+                table_crops_info = []
+
+                for images in self.current_img_items:
+                    image_name = ''.join(images.split('.')[:-1])
+                    self.crops_info[image_name] = ('Category', 'fruits', '(1,2,3,4)')
+                    table_crops_info.append([image_name, 'Category', 'fruits', '(1,2,3,4)'])
+            
+                self.crop_table = get_ttk_table(root=self.window , width=252, 
+                                                column=['IMAGE', 'TYPE', 'LABEL', 'SPECS'], 
+                                                data=table_crops_info
+                                                )
+                self.crop_table.place(
+                    x=14.0,
+                    y=98.0,
+                    height=190
+                )
+
+                self.generate_btn.config(state='normal')
     
     def clear_dir_table(self):
         self.crop_table.place_forget()
@@ -406,12 +413,15 @@ class imagetoexcel:
 
     def remove_excel(self):
         print('Excel Removed.')
-        self.excel_preview_table.place_forget()
-        self.excel_stat.config(state='normal')
-        self.excel_stat.delete(1.0, END)
+        try:
+            self.excel_preview_table.place_forget()
+            self.excel_stat.config(state='normal')
+            self.excel_stat.delete(1.0, END)
 
-        self.file_name_entry.delete(0, END)
-        self.download_btn.config(state='disabled')
+            self.file_name_entry.delete(0, END)
+            self.download_btn.config(state='disabled')
+        except:
+            messagebox.showerror(title='AttributeError', message='application has no attribute "excel_preview_table".')
 
 
     def download_excel(self):

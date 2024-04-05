@@ -612,10 +612,12 @@ class img_crop_label:
                 self.crops_info[cropped_label[0]] = [self.current_crop, self.ratio_coordinates]
                 print(self.crops_info)
                 tree_add_data(data=cropped_label, table=self.cropped_label_table)
+                self.image_visual.itemconfig(self.crops_info[cropped_label[0]][0], outline="lime")
 
                 self.category_name_entry.delete(0, END)
                 self.coordinates = None
                 self.ratio_coordinates = None
+                self.current_crop = None
 
                 # Enable Crop Mode again
                 self.crop_mode = True
@@ -651,12 +653,12 @@ class img_crop_label:
 
         self.crops_info.clear()
 
-    def on_treeview_select(self, event):
-        selected_item = self.cropped_label_table.focus()
-        if selected_item:
-            category = self.cropped_label_table.item(selected_item, option="values")[0]
+    # def on_treeview_select(self, event):
+    #     selected_item = self.cropped_label_table.focus()
+    #     if selected_item:
+    #         category = self.cropped_label_table.item(selected_item, option="values")[0]
 
-        print(category)
+    #     print(category)
 
 
     def select_crop(self, event):
@@ -752,6 +754,10 @@ class img_crop_label:
     def start_cropping(self, event):
         self.start_x = self.image_visual.canvasx(event.x)
         self.start_y = self.image_visual.canvasy(event.y)
+
+        if self.current_crop: # Delete previous crop if not None (unless it is verified)
+            self.image_visual.delete(self.current_crop)
+
         self.current_crop = self.image_visual.create_rectangle(self.start_x, self.start_y, self.start_x, 
                                                       self.start_y, outline="yellow", width=4)
 
@@ -761,19 +767,11 @@ class img_crop_label:
         self.image_visual.coords(self.current_crop, self.start_x, self.start_y, cur_x, cur_y)
 
     def end_cropping(self, event):
-
-        # Disable crop mode
-        self.crop_mode = False
-        self.image_visual.unbind("<ButtonPress-1>")
-        self.image_visual.unbind("<B1-Motion>")
-        self.image_visual.unbind("<ButtonRelease-1>")
-
         image_width = self.image_visual.winfo_width()
         image_height = self.image_visual.winfo_height()
 
         end_x = min(max(event.x, 0), image_width)
         end_y = min(max(event.y, 0), image_height)
-        self.image_visual.itemconfig(self.current_crop, outline="lime")
         x1 = min(self.start_x, end_x)
         y1 = min(self.start_y, end_y)
         x2 = max(self.start_x, end_x)
@@ -787,9 +785,6 @@ class img_crop_label:
                                   round(y1/image_height, 5),
                                   round(crop_width/image_width, 5),
                                   round(crop_height/image_height, 5))
-
-        # Calculate the width and height of the cropped area
-        
 
         print(f'Cropped: {self.ratio_coordinates}')
         self.adjust_cropping()
