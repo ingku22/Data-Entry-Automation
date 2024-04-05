@@ -242,7 +242,7 @@ class automation:
             image=self.button_image_8,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_8 clicked"),
+            command=lambda: excel_handler.verifyExcel({"canvas": self.canvas, "verifyBtn": self.verify_btn}),
             relief="flat"
         )
        
