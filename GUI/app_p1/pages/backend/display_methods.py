@@ -1,5 +1,3 @@
-from tkinter import HIDDEN
-
 coords = {}
 
 def hideElement(element):
