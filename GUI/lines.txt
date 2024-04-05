@@ -1,0 +1,3 @@
+Cluster 1 -> Detail 4 (full)
+Cluster 1 -> Detail 3 (full)
+Cluster 5 -> Detail 2 (full)
