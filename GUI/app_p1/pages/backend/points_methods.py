@@ -8,10 +8,27 @@ class Point:
         self.circle = None
         self.text = None
         self.connected_points = set()  # Set to store connected points
+
+        # Point canvas items
+        if self.shape == 'Items':
+            self.circle = self.canvas.create_oval(self.x - 5, self.y - 5, self.x + 5, self.y + 5, outline='blue', fill='light blue')
+        elif self.shape == 'Options':
+            self.circle = self.canvas.create_polygon(self.x, self.y - 5, self.x + 5, self.y + 5, self.x - 5, self.y + 5, outline='green', fill='light green')
         
-        if shape == 'cluster':
-            self.circle = self.canvas.create_oval(x - 5, y - 5, x + 5, y + 5, outline='blue', fill='light blue')
-        elif shape == 'detail':
-            self.circle = self.canvas.create_polygon(x, y - 5, x + 5, y + 5, x - 5, y + 5, outline='green', fill='light green')
-        
-        self.text = self.canvas.create_text(x, y + 10, text=name, fill='black')
+        self.text = self.canvas.create_text(self.x, self.y + 10, text=self.name, fill='red', font=('Arial', 8))
+
+        # Default: hide items
+        self.canvas.itemconfig(self.circle, state='hidden')
+        self.canvas.itemconfig(self.text, state='hidden')
+
+    def display(self):
+        self.canvas.itemconfig(self.circle, state='normal')
+        self.canvas.itemconfig(self.text, state='normal')
+
+    def hide(self):
+        self.canvas.itemconfig(self.circle, state='hidden')
+        self.canvas.itemconfig(self.text, state='hidden')
+
+    def destroy(self):
+        self.canvas.delete(self.circle)
+        self.canvas.delete(self.text)

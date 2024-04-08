@@ -11,7 +11,7 @@ from tkinter import Tk, ttk, messagebox, Canvas, Entry, Text, Button, PhotoImage
 from tkinter import BOTH, END, LEFT, StringVar
 from idlelib.tooltip import Hovertip
 from backend.table_methods import get_ttk_table, tree_add_data, tree_remove_all_data
-# from backend.data_methods import
+from backend.points_methods import Point
 from backend.file_methods import display_select_file, resize, zip_n_download
 
 class img_crop_label:
@@ -617,13 +617,20 @@ class img_crop_label:
                 # send it to add_data to the update table
                 print('Data Updated')
                 print(cropped_label)
+
+                # Prepare the centerpoint dependancies
+                x1, y1, x2, y2 = self.coordinates
+                center_x = (x2 + x1) // 2
+                center_y = (y2 + y1) // 2
+                shape = self.crop_type.get()
                 
                 # Add crops_info crops_info = {'name': {'plots': ['rectangle', 'circle'], 'type': 'Category', 'coordinates': '[1,2,3,4]'}}
-                # self.crops_info[cropped_label[0]] = [self.current_crop, self.ratio_coordinates]
-                self.crops_info[cropped_label[0]] = {'plots': [self.current_crop], 
+                self.crops_info[cropped_label[0]] = {'plots': [self.current_crop,
+                                                               Point(self.image_visual, cropped_label[0], center_x, center_y, shape)], 
                                                      'type': self.crop_type.get(), 
                                                      'coordinates': self.ratio_coordinates}
                 print(self.crops_info)
+                self.crops_info[cropped_label[0]]['plots'][1].display()
 
                 tree_add_data(data=cropped_label, table=self.cropped_label_table)
                 self.image_visual.itemconfig(self.crops_info[cropped_label[0]]['plots'][0], outline="lime")
@@ -655,6 +662,7 @@ class img_crop_label:
         tree_remove_all_data(table=self.cropped_label_table)
         for stats in self.crops_info.values():
             self.image_visual.delete(stats['plots'][0])
+            stats['plots'][1].destroy()
 
         self.crop_not_found = self.canvas.create_image(
             559.0,
@@ -768,7 +776,7 @@ class img_crop_label:
             self.image_visual.delete(self.current_crop)
 
         self.current_crop = self.image_visual.create_rectangle(self.start_x, self.start_y, self.start_x, 
-                                                      self.start_y, outline="yellow", width=4)
+                                                      self.start_y, outline="yellow", width=3)
 
     def draw_rectangle(self, event):
         cur_x = self.image_visual.canvasx(event.x)
@@ -810,6 +818,8 @@ class img_crop_label:
             if groupname != '--' and groupname in self.crops_info:
                 selected_crop = self.crops_info[groupname]['plots'][0]
                 self.image_visual.delete(selected_crop)
+                self.crops_info[groupname]['plots'][1].destroy()
+
                 self.cropped_label_table.delete(selected_item)  # Delete the selected row
                 self.cropped_image_visual.delete('all')
                 self.crop_not_found = self.canvas.create_image(
