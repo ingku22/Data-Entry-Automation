@@ -319,47 +319,54 @@ class img_crop_label:
             height=25.0
         )
 
-        self.button_image_8 = PhotoImage(
+        self.add_crop_image = PhotoImage(
             file=self.relative_to_assets("button_8.png"))
-        self.add_crop_btn = Button(
+        self.connect_image = PhotoImage(
+            file=self.relative_to_assets("button_16.png")
+        )
+
+        self.add_mark_btn = Button(
             self.window,
-            image=self.button_image_8,
+            image=self.add_crop_image,
             borderwidth=0,
             highlightthickness=0,
             command= self.init_cropping,
             relief="flat"
         )
-        self.add_crop_btn.place(
+        self.add_mark_btn.place(
             x=443.0,
             y=98.0,
             width=96.33131408691406,
             height=26.304079055786133
         )
 
-        self.add_crop_tip = Hovertip(self.add_crop_btn,
+        self.add_mark_tip = Hovertip(self.add_mark_btn,
                                      'Activates CROP MODE\nAllows you to crop images. Only active when no current crop is made.\nTo enable the Add Crop Button, ensure that all previous crops have been labelled and added to the table.\n Yellow - Unlabelled\nGreen - Labelled', hover_delay=10)
 
-        self.button_image_9 = PhotoImage(
+        self.delete_crop_image = PhotoImage(
             file=self.relative_to_assets("button_9.png"))
-        self.delete_crop_btn = Button(
+        self.disconnect_image = PhotoImage(
+            file=self.relative_to_assets("button_17.png"))
+
+        self.remove_mark_btn = Button(
             self.window,
-            image=self.button_image_9,
+            image=self.delete_crop_image,
             borderwidth=0,
             highlightthickness=0,
             command=self.delete_cropping,
             relief="flat"
         )
-        self.delete_crop_btn.place(
+        self.remove_mark_btn.place(
             x=543.0,
             y=98.0,
             width=111.0,
             height=25.0
         )
 
-        self.delete_crop_tip = Hovertip(self.delete_crop_btn,
+        self.remove_mark_tip = Hovertip(self.remove_mark_btn,
                                      'Deletes Selected Crop\nOnly active if a crop data is selecte.\nTo enable the Delete Crop Button, ensure that you have selected a crop to delete in the data table below.', hover_delay=10)
 
-        self.canvas.create_text(
+        self.button_panel_container = self.canvas.create_text(
             444.0,
             75.0,
             anchor="nw",
@@ -382,8 +389,8 @@ class img_crop_label:
         #     ['Retail', '[35,35,35,35]']
         # ]
 
-        # Menu Category Data Table
-        self.canvas.create_text(
+        # Data Table Container
+        self.table_container = self.canvas.create_text(
             444.0,
             322.0,
             anchor="nw",
@@ -510,17 +517,19 @@ class img_crop_label:
             y=500.0
         )
 
-        self.button_image_13 = PhotoImage(
+        self.stage_crops_image = PhotoImage(
             file=self.relative_to_assets("button_13.png"))
-        self.stage_crops_btn = Button(
+        self.stage_links_image = PhotoImage(
+            file=self.relative_to_assets("button_14.png")
+        )
+        self.stage_btn = Button(
             self.window,
-            image=self.button_image_13,
+            image=self.stage_crops_image,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_13 clicked"),
             relief="flat"
         )
-        self.stage_crops_btn.place(
+        self.stage_btn.place(
             x=578.0,
             y=323.0,
             width=107.0,
@@ -587,7 +596,7 @@ class img_crop_label:
 
         # save and extract buttons
         self.download_folder_btn.config(command=lambda dwnld=True: self.saved_cropped_img(download=dwnld))
-        self.stage_crops_btn.config(command=self.saved_cropped_img)
+        self.stage_btn.config(command=self.saved_cropped_img)
         
         # link buttons
         self.toggle_link_crop_btn.config(command=self.toggle_link_mode)
@@ -874,6 +883,13 @@ class img_crop_label:
             self.crop_mode = False
             self.start_point = None
 
+            self.canvas.itemconfig(self.button_panel_container, text='Group Link Editor')
+            self.canvas.itemconfig(self.table_container, text='Linked Points')
+            self.stage_btn.config(image=self.stage_links_image, command=lambda: print('Stage Links'))
+
+            self.add_mark_btn.config(image=self.connect_image, command=lambda: print('Add Connection'))
+            self.remove_mark_btn.config(image=self.disconnect_image, command=lambda: print('Delete Connection'))
+
             self.add_cropped_label_btn.config(state='disabled')
             self.image_visual.unbind("<ButtonPress-1>")
             self.image_visual.unbind("<B1-Motion>")
@@ -883,6 +899,13 @@ class img_crop_label:
         else:
             print('Link mode disabled.')
             self.crop_mode = True
+
+            self.canvas.itemconfig(self.button_panel_container, text='Label/Image Editor')
+            self.canvas.itemconfig(self.table_container, text='Menu Categories')
+            self.stage_btn.config(image=self.stage_crops_image, command=self.saved_cropped_img)
+
+            self.add_mark_btn.config(image=self.add_crop_image, command=self.init_cropping)
+            self.remove_mark_btn.config(image=self.delete_crop_image, command=self.delete_cropping)
 
             self.add_cropped_label_btn.config(state='normal')
             self.image_visual.unbind("<Button-1>")
