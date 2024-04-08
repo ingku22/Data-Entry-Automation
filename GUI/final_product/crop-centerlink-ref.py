@@ -28,16 +28,16 @@ class ImageCropper:
         self.canvas.pack(fill=tk.BOTH, expand=True)
 
         self.confirm_button = tk.Button(master, text="Confirm", command=self.confirm_crop)
-        self.confirm_button.pack()
+        self.confirm_button.pack(side=tk.LEFT)
         
         self.link_button = tk.Button(master, text="Link Crops", command=self.toggle_link_mode)
-        self.link_button.pack()
+        self.link_button.pack(side=tk.LEFT)
 
         self.extract_button = tk.Button(master, text="Extract Structure", command=self.extract_structure)
-        self.extract_button.pack()
+        self.extract_button.pack(side=tk.LEFT)
         
         self.analyse_button = tk.Button(master, text="Analyse Connection", command=self.analyse_connection)
-        self.analyse_button.pack()
+        self.analyse_button.pack(side=tk.LEFT)
 
         self.link_mode = False
         self.rect_start = None
@@ -52,9 +52,9 @@ class ImageCropper:
         self.center_shape.set("cluster")
 
         self.cluster_radio = tk.Radiobutton(master, text="Clusters", variable=self.center_shape, value="cluster")
-        self.cluster_radio.pack(anchor=tk.W)
+        self.cluster_radio.pack(anchor=tk.W, side=tk.LEFT)
         self.detail_radio = tk.Radiobutton(master, text="Details", variable=self.center_shape, value="detail")
-        self.detail_radio.pack(anchor=tk.W)
+        self.detail_radio.pack(anchor=tk.W, side=tk.LEFT)
 
         self.canvas.bind("<ButtonPress-1>", self.start_crop)
         self.canvas.bind("<B1-Motion>", self.draw_rectangle)
@@ -114,9 +114,30 @@ class ImageCropper:
                     break
 
     def draw_line(self, point1, point2):
+        if (point1.shape == 'detail' and point2.shape == 'detail') or (point1.shape == 'cluster' and point2.shape == 'cluster'):
+            print("Same type points cannot connect to each other.")
+            self.set_color_to_default([point1, point2])
+
+            return
+        elif point1.name == point2.name:
+            print('Same points cannot connect to each other.')
+            self.set_color_to_default([point1, point2])
+
+        # Rearrange the points based on their shapes
+        elif point1.shape == 'detail' and point2.shape == 'cluster':
+            point1, point2 = point2, point1
+  
         self.line = self.canvas.create_line(point1.x, point1.y, point2.x, point2.y, fill='red')
         point1.connected_points.add(point2)
         print(f"{point1.name} - {point2.name}")  # Print connected points
+
+
+    def set_color_to_default(self, points:list):
+        for point in points:
+            if point.shape == 'cluster':
+                self.canvas.itemconfig(point.circle, fill='light blue')
+            elif point.shape == 'detail':
+                self.canvas.itemconfig(point.circle, fill='light green')
 
     def toggle_link_mode(self):
         self.link_mode = not self.link_mode
@@ -138,12 +159,12 @@ class ImageCropper:
             for point in self.points:
                 for connected_point in point.connected_points:
                     if point.shape == 'cluster' and connected_point.shape == 'detail':
-                        f.write(f"{point.name} -> {connected_point.name} (full)\n")
+                        f.write(f"{point.name} - {connected_point.name} (full)\n")
                     elif point.shape == 'cluster' and connected_point.shape == 'cluster':
                         new_cluster_name = f"{point.name}/{connected_point.name}"
-                        f.write(f"{point.name} -> {connected_point.name} (merge) = {new_cluster_name}\n")
+                        f.write(f"{point.name} - {connected_point.name} (merge) = {new_cluster_name}\n")
                     elif point.shape == 'detail' and connected_point.shape == 'cluster':
-                        f.write(f"{point.name} -> {connected_point.name} (full)\n")
+                        f.write(f"{point.name} - {connected_point.name} (full)\n")
 
     def analyse_connection(self):
         G = nx.Graph()
