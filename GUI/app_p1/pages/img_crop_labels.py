@@ -11,7 +11,7 @@ from tkinter import Tk, ttk, messagebox, Canvas, Entry, Text, Button, PhotoImage
 from tkinter import BOTH, END, LEFT, StringVar
 from idlelib.tooltip import Hovertip
 from backend.table_methods import get_ttk_table, tree_add_data, tree_remove_all_data
-# from backend.data_methods import
+from backend.points_methods import Point
 from backend.file_methods import display_select_file, resize, zip_n_download
 
 class img_crop_label:
@@ -42,8 +42,17 @@ class img_crop_label:
         self.current_crop = None
         self.ratio_coordinates = None # (x1 %pos, y1 %pos, %width, %height) for resized image + cropping
         self.coordinates = None # (x1, y1, x2, y2) based on cropped image pixels
+
+        # MAIN DATA STRUCTURES
+        # ===========================
+
+        # self.crops_info {'name': {'plots': ['rectangle', 'circle'], 'type': 'Category', 'coordinates': '[1,2,3,4]'}}
         self.crops_info = {}
 
+        # self.links {'Category': 'Options', 'Options', 'Options'}
+        # self.links = {}
+
+        # Canvas
         self.canvas = Canvas(
             self.window,
             bg = "#D2D2D2",
@@ -118,14 +127,14 @@ class img_crop_label:
             476.5,
             image=self.entry_image_1
         )
-        self.category_name_entry = Entry(
+        self.group_name_entry = Entry(
             self.window,
             bd=0,
             bg="#FFFFFF",
             fg="#000716",
             highlightthickness=0
         )
-        self.category_name_entry.place(
+        self.group_name_entry.place(
             x=156.0,
             y=464.0,
             width=231.0,
@@ -514,6 +523,23 @@ class img_crop_label:
             height=18.0
         )
 
+        self.button_image_15 = PhotoImage(
+            file=self.relative_to_assets("button_15.png"))
+        self.button_15 = Button(
+            self.window,
+            image=self.button_image_15,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: print("button_12 clicked"),
+            relief="flat"
+        )
+        self.button_15.place(
+            x=599.2535400390625,
+            y=68.0,
+            width=87.74642944335938,
+            height=18.0
+        )
+
         self.init_button_commands()
 
     # ======================= BACKEND ======================
@@ -578,12 +604,12 @@ class img_crop_label:
     def saved_cropped_img(self, download=False):
         string_info = 'Items saved into staging folder:\n'
 
-        for category, crop_stats in self.crops_info.items():
-            _, coords = crop_stats
+        for groupname, crop_stats in self.crops_info.items():
+            coords = crop_stats['coordinates']
             cropped_img, _ = self.get_cropped_image(coords)
-            cropped_img.save(self.STAGING_PATH / f'{category}.jpg')
+            cropped_img.save(self.STAGING_PATH / f'{groupname}.jpg')
 
-            string_info += f'\n{category}.jpg'
+            string_info += f'\n{groupname}.jpg'
 
         messagebox.showinfo(
             title='SaveInfo',
@@ -600,7 +626,7 @@ class img_crop_label:
     # obtaining/verifying cropped label row data
 
     def verify_cropped_label_data(self):
-        cropped_label = [self.category_name_entry.get(), str(self.ratio_coordinates)]
+        cropped_label = [self.group_name_entry.get(), str(self.ratio_coordinates)]
 
         if (type(cropped_label[0]) == str) and (type(cropped_label[1]) == str) and type(ast.literal_eval(cropped_label[1])) in [list, tuple]:
 
@@ -608,13 +634,30 @@ class img_crop_label:
                 # send it to add_data to the update table
                 print('Data Updated')
                 print(cropped_label)
-                
-                self.crops_info[cropped_label[0]] = [self.current_crop, self.ratio_coordinates]
-                print(self.crops_info)
-                tree_add_data(data=cropped_label, table=self.cropped_label_table)
-                self.image_visual.itemconfig(self.crops_info[cropped_label[0]][0], outline="lime")
 
-                self.category_name_entry.delete(0, END)
+                # Prepare the centerpoint dependancies
+                # ==================================
+                # Important Point Attributes
+                # point.circle, point.text -> displayed canvas items
+                # point.connected_points -> gets list of points linked to itself
+                # ==================================
+                x1, y1, x2, y2 = self.coordinates
+                center_x = (x2 + x1) // 2
+                center_y = (y2 + y1) // 2
+                shape = self.crop_type.get()
+                
+                # Add crops_info crops_info = {'name': {'plots': ['rectangle', 'circle'], 'type': 'Category', 'coordinates': '[1,2,3,4]'}}
+                self.crops_info[cropped_label[0]] = {'plots': [self.current_crop,
+                                                               Point(self.image_visual, cropped_label[0], center_x, center_y, shape)], 
+                                                     'type': self.crop_type.get(), 
+                                                     'coordinates': self.ratio_coordinates}
+                print(self.crops_info)
+                self.crops_info[cropped_label[0]]['plots'][1].display()
+
+                tree_add_data(data=cropped_label, table=self.cropped_label_table)
+                self.image_visual.itemconfig(self.crops_info[cropped_label[0]]['plots'][0], outline="lime")
+
+                self.group_name_entry.delete(0, END)
                 self.coordinates = None
                 self.ratio_coordinates = None
                 self.current_crop = None
@@ -639,8 +682,9 @@ class img_crop_label:
 
     def clear_all_label_data(self):
         tree_remove_all_data(table=self.cropped_label_table)
-        for rect in self.crops_info.values():
-            self.image_visual.delete(rect[0])
+        for stats in self.crops_info.values():
+            self.image_visual.delete(stats['plots'][0])
+            stats['plots'][1].destroy()
 
         self.crop_not_found = self.canvas.create_image(
             559.0,
@@ -653,24 +697,16 @@ class img_crop_label:
 
         self.crops_info.clear()
 
-    # def on_treeview_select(self, event):
-    #     selected_item = self.cropped_label_table.focus()
-    #     if selected_item:
-    #         category = self.cropped_label_table.item(selected_item, option="values")[0]
-
-    #     print(category)
-
 
     def select_crop(self, event):
         # Highlight Crop on Image
-        # item = int(self.cropped_label_table.selection()[0][1:])
         selected_item = self.cropped_label_table.focus()
         if selected_item:
-            category = self.cropped_label_table.item(selected_item, option="values")[0]
+            groupname = self.cropped_label_table.item(selected_item, option="values")[0]
 
-        if category == '--':
+        if groupname == '--':
             for r in self.crops_info.values():
-                self.image_visual.itemconfig(r[0], outline="lime")  # Reset all outlines
+                self.image_visual.itemconfig(r['plots'][0], outline="lime")  # Reset all outlines
                 self.crop_not_found = self.canvas.create_image(
                     559.0,
                     226.0,
@@ -679,10 +715,12 @@ class img_crop_label:
                 )
                 self.cropped_image_visual.place_forget()
 
-        elif category in list(self.crops_info.keys()):
-            rect, coords = self.crops_info[category]
-            for r in self.crops_info.values():
-                self.image_visual.itemconfig(r[0], outline="lime")  # Reset all outlines
+        elif groupname in list(self.crops_info.keys()):
+            rect = self.crops_info[groupname]['plots'][0]
+            coords = self.crops_info[groupname]['coordinates']
+
+            for stats in self.crops_info.values():
+                self.image_visual.itemconfig(stats['plots'][0], outline="lime")  # Reset all outlines
             self.image_visual.itemconfig(rect, outline="blue")   # Set selected outline to blue
 
             # Display Cropped Image on Preview
@@ -730,7 +768,7 @@ class img_crop_label:
         return cropped_img, (x2-x1, y2-y1)
 
     # Methodology
-    # crop mode -> crop -> rename the category, add the category, shows up as image + add table
+    # crop mode -> crop -> rename the group, add the group, shows up as image + add table
 
     def init_cropping(self):
         print('Initializing Cropping...')
@@ -759,7 +797,7 @@ class img_crop_label:
             self.image_visual.delete(self.current_crop)
 
         self.current_crop = self.image_visual.create_rectangle(self.start_x, self.start_y, self.start_x, 
-                                                      self.start_y, outline="yellow", width=4)
+                                                      self.start_y, outline="yellow", width=3)
 
     def draw_rectangle(self, event):
         cur_x = self.image_visual.canvasx(event.x)
@@ -796,11 +834,13 @@ class img_crop_label:
     def delete_cropping(self):
         selected_item = self.cropped_label_table.focus()
         if selected_item:
-            category = self.cropped_label_table.item(selected_item, option="values")[0]
+            groupname = self.cropped_label_table.item(selected_item, option="values")[0]
 
-            if category != '--' and category in self.crops_info:
-                selected_crop = self.crops_info[category][0]
+            if groupname != '--' and groupname in self.crops_info:
+                selected_crop = self.crops_info[groupname]['plots'][0]
                 self.image_visual.delete(selected_crop)
+                self.crops_info[groupname]['plots'][1].destroy()
+
                 self.cropped_label_table.delete(selected_item)  # Delete the selected row
                 self.cropped_image_visual.delete('all')
                 self.crop_not_found = self.canvas.create_image(
@@ -811,7 +851,7 @@ class img_crop_label:
                 )
                 self.cropped_image_visual.place_forget()
                 
-                del self.crops_info[category]
+                del self.crops_info[groupname]
 
 
 
@@ -829,6 +869,3 @@ class img_crop_label:
         self.window.pack_forget()
 
 
-
-# Page = img_crop_label()
-# Page.run()
