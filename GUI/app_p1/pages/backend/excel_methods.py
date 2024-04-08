@@ -123,31 +123,6 @@ class ExcelHandler:
         close_button = Button(popup, text="Close", command=popup.destroy)
         close_button.pack(pady=10)
 
-    # def validateLinkedSheet(self, sheet, sheet_name):
-    #     match sheet_name:
-    #         case "Linked Category":
-    #             ref_ItemID = pd.read_excel(self.excel_file, sheet_name="Menu Items")["ItemID"]
-    #             ref_CategoryID = pd.read_excel(self.excel_file, sheet_name="Menu Category")["CategoryID"]
-    #             df1 = pd.merge(sheet, ref_ItemID, how="right", on="ItemID")
-    #             df2 = pd.merge(sheet, ref_CategoryID, how="right", on="CategoryID")
-    #         case "Linked Dish":
-    #             ref_ItemID = pd.read_excel(self.excel_file, sheet_name="Menu Items")["ItemID"]
-    #             ref_GroupID = pd.read_excel(self.excel_file, sheet_name="Option Groups")["GroupID"]
-    #             df1 = pd.merge(sheet, ref_ItemID,how="right", on="ItemID")
-    #             df2 = pd.merge(sheet, ref_GroupID, how="right", on="GroupID")
-    #         case "Linked Options":
-    #             ref_GroupID = pd.read_excel(self.excel_file, sheet_name="Option Groups")["GroupID"]
-    #             ref_OptionID = pd.read_excel(self.excel_file, sheet_name="Options")["OptionID"]
-    #             df1 = pd.merge(sheet, ref_GroupID, how="right", on="GroupID")
-    #             df2 = pd.merge(sheet, ref_OptionID, how="right", on="OptionID")
-        
-    #     # Compare dataframes to see what data is excluded
-    #     common_df = pd.merge(df1, df2, how="inner")
-    #     compare_df = pd.merge(sheet, common_df, how="outer", indicator=True)
-    #     excluded_data = compare_df[compare_df["_merge"]=="left_only"].drop(columns=["_merge"])
-    #     if (not excluded_data.empty):
-    #         print(excluded_data)   
- 
     def verifyExcel(self, elements):
         sheet_names = self.excel_file.sheet_names
 
