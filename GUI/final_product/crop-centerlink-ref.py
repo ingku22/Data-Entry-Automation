@@ -168,10 +168,6 @@ class ImageCropper:
 
     def analyse_connection(self):
         G = nx.Graph()
-        for point in self.points:
-            for connected_point in point.connected_points:
-                G.add_edge(point.name, connected_point.name)
-
         connected_components = list(nx.connected_components(G))
         print("Connected Components:")
         for idx, component in enumerate(connected_components, 1):
