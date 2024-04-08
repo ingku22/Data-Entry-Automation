@@ -50,7 +50,7 @@ class img_crop_label:
         self.crops_info = {}
 
         # self.links {'Category': 'Options', 'Options', 'Options'}
-        self.links = {}
+        # self.links = {}
 
         # Canvas
         self.canvas = Canvas(
@@ -523,6 +523,23 @@ class img_crop_label:
             height=18.0
         )
 
+        self.button_image_15 = PhotoImage(
+            file=self.relative_to_assets("button_15.png"))
+        self.button_15 = Button(
+            self.window,
+            image=self.button_image_15,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: print("button_12 clicked"),
+            relief="flat"
+        )
+        self.button_15.place(
+            x=599.2535400390625,
+            y=68.0,
+            width=87.74642944335938,
+            height=18.0
+        )
+
         self.init_button_commands()
 
     # ======================= BACKEND ======================
@@ -619,6 +636,11 @@ class img_crop_label:
                 print(cropped_label)
 
                 # Prepare the centerpoint dependancies
+                # ==================================
+                # Important Point Attributes
+                # point.circle, point.text -> displayed canvas items
+                # point.connected_points -> gets list of points linked to itself
+                # ==================================
                 x1, y1, x2, y2 = self.coordinates
                 center_x = (x2 + x1) // 2
                 center_y = (y2 + y1) // 2
@@ -678,7 +700,6 @@ class img_crop_label:
 
     def select_crop(self, event):
         # Highlight Crop on Image
-        # item = int(self.cropped_label_table.selection()[0][1:])
         selected_item = self.cropped_label_table.focus()
         if selected_item:
             groupname = self.cropped_label_table.item(selected_item, option="values")[0]
@@ -848,6 +869,3 @@ class img_crop_label:
         self.window.pack_forget()
 
 
-
-# Page = img_crop_label()
-# Page.run()
