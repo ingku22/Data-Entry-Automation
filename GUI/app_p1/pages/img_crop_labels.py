@@ -46,6 +46,7 @@ class img_crop_label:
 
         self.current_line = None
         self.start_point = None
+        self.end_point = None
 
         # MAIN DATA STRUCTURES
         # ===========================
@@ -882,12 +883,14 @@ class img_crop_label:
             print('Link Mode enabled.')
             self.crop_mode = False
             self.start_point = None
+            self.end_point = None
 
             self.canvas.itemconfig(self.button_panel_container, text='Group Link Editor')
             self.canvas.itemconfig(self.table_container, text='Linked Points')
             self.stage_btn.config(image=self.stage_links_image, command=lambda: print('Stage Links'))
+            self.cropped_label_table.place_forget()
 
-            self.add_mark_btn.config(image=self.connect_image, command=lambda: print('Add Connection'))
+            self.add_mark_btn.config(image=self.connect_image, command=self.confirm_link)
             self.remove_mark_btn.config(image=self.disconnect_image, command=lambda: print('Delete Connection'))
 
             self.add_cropped_label_btn.config(state='disabled')
@@ -933,7 +936,6 @@ class img_crop_label:
                         print(f'{point.name} ({point.shape}) selected.')
                         self.image_visual.itemconfig(point.circle, fill='cyan')  # Change point color to red
                         self.draw_line(self.start_point, point)
-                        self.start_point = None
                     break
 
     def draw_line(self, point1, point2):
@@ -941,28 +943,39 @@ class img_crop_label:
             print("Same type points cannot connect to each other.")
             self.set_color_to_default([point1, point2])
             return
-        
+
         elif point1.name == point2.name:
             print('Same points cannot connect to each other.')
             self.set_color_to_default([point1, point2])
+            return 
 
         # Rearrange the points based on their shapes
         elif point1.shape == 'Options' and point2.shape == 'Items':
-            point1, point2 = point2, point1
-  
+            self.start_point, self.end_point = point2, point1
+
+        else:
+            self.start_point, self.end_point = point1, point2
+
         self.current_line = self.image_visual.create_line(point1.x, point1.y, point2.x, point2.y, fill='cyan', width=2)
         link_text = f"{point1.name} - {point2.name}"
         print(link_text)  # Print connected points
 
+    def confirm_link(self):
+        confirm_link_hex = '#00DBFF'
+        self.image_visual.itemconfig(self.current_line, fill=confirm_link_hex)
+        self.image_visual.itemconfig(self.start_point.circle, fill=confirm_link_hex)
+        self.image_visual.itemconfig(self.end_point.circle, fill=confirm_link_hex)
+
         # Add to links data structure
-        if point1.name not in self.links.keys():
-            self.links[point1.name] = {'points': [point2],
+        if self.start_point.name not in self.links.keys():
+            self.links[self.start_point.name] = {'points': [self.start_point, self.end_point],
                                        'line': [self.current_line]}
         else:
-            self.links[point1.name]['points'].append(point2)
-            self.links[point1.name]['line'].append(self.current_line)
+            self.links[self.start_point.name]['points'].append(self.end_point)
+            self.links[self.start_point.name]['line'].append(self.current_line)
 
         print(self.links)
+        self.start_point = self.end_point = None
 
     def set_color_to_default(self, points:list):
         for point in points:
