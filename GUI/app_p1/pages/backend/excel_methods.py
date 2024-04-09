@@ -96,7 +96,7 @@ class ExcelHandler:
 
         currentSheet = pd.read_excel(self.excel_file, sheet_name=self.sheetNo)
         excelHeaders = tuple(currentSheet.columns.values)
-        canvas.itemconfig(label, text=f"{self.excel_file.slaheet_names[self.sheetNo]}")
+        canvas.itemconfig(label, text=f"{self.excel_file.sheet_names[self.sheetNo]}")
 
         # Define columns
         self.treeview["columns"] = excelHeaders

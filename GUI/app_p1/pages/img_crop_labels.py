@@ -379,23 +379,23 @@ class img_crop_label:
         # Menu Category Data Init
         LABEL_COLUMNS = ['Category', 'Cropped Dimensions']
         LABEL_DATA = [['--', '(-, -, -, -)']]
-        # LABEL_DATA = [
-        #     ['Appetizers', '[35,35,35,35]'],
-        #     ['Drinks', '[35,35,35,35]'],
-        #     ['Soups', '[35,35,35,35]'],
-        #     ['Main Dish', '[35,35,35,35]'],
-        #     ['Pizza Toppings', '[35,35,35,35]'],
-        #     ['Specials', '[35,35,35,35]'],
-        #     ['Desserts', '[35,35,35,35]'],
-        #     ['Retail', '[35,35,35,35]']
-        # ]
+        LINK_COLUMNS = ['Point1', 'Point2']
+
+        # Link Table Container
+        self.link_container = None
+
+        self.link_table = get_ttk_table(root=self.window, width=230,
+                                        column=LINK_COLUMNS,
+                                        data=LABEL_DATA)
+        
+        # Update link table = [[points['points'][0].name, points['points'][1].name] for points in self.links.values()]
 
         # Data Table Container
         self.table_container = self.canvas.create_text(
             444.0,
             322.0,
             anchor="nw",
-            text="Menu Categories",
+            text="Menu Group Items",
             fill="#8F8F8F",
             font=("MS Sans Serif", 12)
         )
@@ -403,6 +403,7 @@ class img_crop_label:
         self.cropped_label_table = get_ttk_table(root=self.window , width=230, 
                                             column=LABEL_COLUMNS,
                                             data=LABEL_DATA)
+        
         style = ttk.Style()
         style.theme_use('default')
         style.configure('Treeview', background='#808080', fieldbackground='#000000', 
@@ -417,6 +418,9 @@ class img_crop_label:
             y=346.0,
             height=130
         )
+
+        self.cropped_label_table_tip = Hovertip(self.cropped_label_table, 
+                                                text='Table containing Labelled Crops.\nIn Crop Mode, selecting a table element will return the preview of cropped image.\nIn Link Mode, selecting a table element will open up group link settings', hover_delay=10)
 
         self.button_image_10 = PhotoImage(
             file=self.relative_to_assets("button_10.png"))
@@ -707,14 +711,15 @@ class img_crop_label:
             for lines in links['line']:
                 self.image_visual.delete(lines)
 
-        self.crop_not_found = self.canvas.create_image(
-            559.0,
-            226.0,
-            image=self.image_image_5,
-            tag=('crop_not_found')
-        )
+        if not self.link_mode:
+            self.crop_not_found = self.canvas.create_image(
+                559.0,
+                226.0,
+                image=self.image_image_5,
+                tag=('crop_not_found')
+            )
 
-        self.cropped_image_visual.place_forget()
+            self.cropped_image_visual.place_forget()
 
         self.crops_info.clear()
 
@@ -885,14 +890,32 @@ class img_crop_label:
             self.start_point = None
             self.end_point = None
 
+            # Redesign for link table purposes
+            self.canvas.delete("crop_not_found")
+
             self.canvas.itemconfig(self.button_panel_container, text='Group Link Editor')
-            self.canvas.itemconfig(self.table_container, text='Linked Points')
             self.stage_btn.config(image=self.stage_links_image, command=lambda: print('Stage Links'))
-            self.cropped_label_table.place_forget()
+            self.stage_btn.place(x=self.stage_btn.winfo_x(), y=self.stage_btn.winfo_y()-155)
+
+            self.link_table.place(
+            x=444.0,
+            y=191.0,
+            height=107
+            )
+
+            self.link_container = self.canvas.create_text(
+            444.0,
+            167.0,
+            anchor='nw',
+            text="Linked Points",
+            fill="#8F8F8F",
+            font=("MS Sans Serif", 12)
+            )
 
             self.add_mark_btn.config(image=self.connect_image, command=self.confirm_link)
             self.remove_mark_btn.config(image=self.disconnect_image, command=lambda: print('Delete Connection'))
 
+            # remove cropping binds
             self.add_cropped_label_btn.config(state='disabled')
             self.image_visual.unbind("<ButtonPress-1>")
             self.image_visual.unbind("<B1-Motion>")
@@ -903,9 +926,18 @@ class img_crop_label:
             print('Link mode disabled.')
             self.crop_mode = True
 
+            self.link_table.place_forget()
+            self.canvas.delete(self.link_container)
+            self.crop_not_found = self.canvas.create_image(
+                    559.0,
+                    226.0,
+                    image=self.image_image_5,
+                    tag=('crop_not_found')
+                )
+
             self.canvas.itemconfig(self.button_panel_container, text='Label/Image Editor')
-            self.canvas.itemconfig(self.table_container, text='Menu Categories')
             self.stage_btn.config(image=self.stage_crops_image, command=self.saved_cropped_img)
+            self.stage_btn.place(x=self.stage_btn.winfo_x(), y=self.stage_btn.winfo_y()+155)
 
             self.add_mark_btn.config(image=self.add_crop_image, command=self.init_cropping)
             self.remove_mark_btn.config(image=self.delete_crop_image, command=self.delete_cropping)
