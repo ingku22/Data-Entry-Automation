@@ -5,7 +5,8 @@ from pathlib import Path
 # from tkinter import *
 # Explicit imports to satisfy Flake8
 import pandas as pd
-from tkinter import ttk, Tk, Canvas, Button, PhotoImage, Frame, filedialog, BOTH, Label
+from tkinter import Canvas, Button, PhotoImage, Frame, BOTH
+from idlelib.tooltip import Hovertip
 from backend.automationprocess import automation_process
 from backend.excel_methods import ExcelHandler
 from backend.display_methods import hideElement, showElement 
@@ -114,9 +115,12 @@ class automation:
             height=64.0
         )
 
+        self.automate_tip = Hovertip(self.automate_btn,
+                                        'Automates data entry process.\nTo enable this button, input a valid excel file and click on verify\nRun time will take approximately 3 minuites per each run. \nErrors will be displayed apon any blockers or interruptions.', hover_delay=10)
+
         self.button_image_2 = PhotoImage(
             file=self.relative_to_assets("button_2.png"))
-        self.button_2 = Button(
+        self.settings_btn = Button(
             self.window,
             image=self.button_image_2,
             borderwidth=0,
@@ -124,31 +128,37 @@ class automation:
             command=lambda: print("button_2 clicked"),
             relief="flat"
         )
-        self.button_2.place(
+        self.settings_btn.place(
             x=425.0,
             y=133.0,
             width=64.0,
             height=64.0
         )
 
+        self.settings_tip = Hovertip(self.settings_btn,
+                                     'Customizes Automation Process.\nCurrently unavailable.', hover_delay=10)
+
         self.button_image_3 = PhotoImage(
             file=self.relative_to_assets("button_3.png"))
-        self.button_3 = Button(
+        self.upload_excel_btn = Button(
             self.window,
             image=self.button_image_3,
             borderwidth=0,
             highlightthickness=0,
             command=lambda: excel_handler.uploadExcel({"canvas": self.canvas, "label": self.label, "automateBtn": self.automate_btn, 
-                                                       "uploadImg": self.image_2, "uploadBtn": self.button_3, "deleteBtn": self.delete_excel_btn,
+                                                       "uploadImg": self.image_2, "uploadBtn": self.upload_excel_btn, "deleteBtn": self.delete_excel_btn,
                                                        "verifyBtn": self.verify_btn}),
             relief="flat"
         )
-        self.button_3.place(
+        self.upload_excel_btn.place(
             x=62.0,
             y=449.0,
             width=128.0,
             height=32.0
         )   
+
+        self.upload_excel_tip = Hovertip(self.upload_excel_btn,
+                                        'Button to import excel.\nExcel uploaded will not dissapear unless deleted and replaced with another excel.', hover_delay=10)
 
         self.image_image_2 = PhotoImage(
             file=self.relative_to_assets("image_2.png"))
@@ -235,6 +245,9 @@ class automation:
             relief="flat"
         )
 
+        self.delete_excel_tip = Hovertip(self.delete_excel_btn,
+                                     'Deletes Current Excel File\nOnly active when the Excel sheet is displayed on the page.\nWill disable the Automate button and verification will reset.', hover_delay=10)
+
         self.button_image_8 = PhotoImage(
             file=self.relative_to_assets("button_8.png"))
         self.verify_btn = Button(
@@ -246,7 +259,8 @@ class automation:
             relief="flat"
         )
        
-        
+        self.verify_tip = Hovertip(self.verify_btn,
+                                     'Verifies Excel tables\nButton will turn green on successful verification and enable the Automate button.\nIf verification fails, a message will appear on this page.', hover_delay=10)
 
         self.button_image_9 = PhotoImage(
             file=self.relative_to_assets("button_9.png"))
