@@ -54,8 +54,8 @@ class img_crop_label:
         # self.crops_info {'name': {'plots': ['rectangle', 'circle'], 'type': 'Category', 'coordinates': '[1,2,3,4]'}}
         self.crops_info = {}
 
-        # self.links {'Category': 'Options', 'Options', 'Options'}
-        self.links = {}
+        # self.links (Contains links with corresponding line)
+        self.links = {'links': [], 'line': []}
 
         # Canvas
         self.canvas = Canvas(
@@ -387,8 +387,6 @@ class img_crop_label:
         self.link_table = get_ttk_table(root=self.window, width=230,
                                         column=LINK_COLUMNS,
                                         data=LABEL_DATA)
-        
-        # Update link table = [[points['points'][0].name, points['points'][1].name] for points in self.links.values()]
 
         # Data Table Container
         self.table_container = self.canvas.create_text(
@@ -610,6 +608,8 @@ class img_crop_label:
         self.cropped_label_table.bind("<ButtonRelease-1>", self.select_crop)
         self.group_name_entry.bind("<Return>", self.verify_cropped_label_data)
 
+        self.link_table.bind("<ButtonRelease-1>", self.select_link)
+
 
     def change_crop_type(self):
         if self.crop_type.get() == 'Items':
@@ -808,53 +808,57 @@ class img_crop_label:
         self.image_visual.coords(self.current_crop, x1, y1, x2, y2)
 
     def select_crop(self, event):
-        # Highlight Crop on Image
         selected_item = self.cropped_label_table.focus()
         if selected_item:
             groupname = self.cropped_label_table.item(selected_item, option="values")[0]
 
-        if groupname == '--':
-            for r in self.crops_info.values():
-                self.image_visual.itemconfig(r['plots'][0], outline="lime")  # Reset all outlines
-                self.crop_not_found = self.canvas.create_image(
-                    559.0,
-                    226.0,
-                    image=self.image_image_5,
-                    tag=('crop_not_found')
-                )
-                self.cropped_image_visual.place_forget()
+        if self.link_mode:
+            print(f'Output {groupname} settings')
+        
+        else:
+            # Highlight Crop on Image 
+            if groupname == '--':
+                for r in self.crops_info.values():
+                    self.image_visual.itemconfig(r['plots'][0], outline="lime")  # Reset all outlines
+                    self.crop_not_found = self.canvas.create_image(
+                        559.0,
+                        226.0,
+                        image=self.image_image_5,
+                        tag=('crop_not_found')
+                    )
+                    self.cropped_image_visual.place_forget()
 
-        elif groupname in list(self.crops_info.keys()):
-            rect = self.crops_info[groupname]['plots'][0]
-            coords = self.crops_info[groupname]['coordinates']
+            elif groupname in list(self.crops_info.keys()):
+                rect = self.crops_info[groupname]['plots'][0]
+                coords = self.crops_info[groupname]['coordinates']
 
-            for stats in self.crops_info.values():
-                self.image_visual.itemconfig(stats['plots'][0], outline="lime")  # Reset all outlines
-            self.image_visual.itemconfig(rect, outline="blue")   # Set selected outline to blue
+                for stats in self.crops_info.values():
+                    self.image_visual.itemconfig(stats['plots'][0], outline="lime")  # Reset all outlines
+                self.image_visual.itemconfig(rect, outline="blue")   # Set selected outline to blue
 
-            # Display Cropped Image on Preview
-            self.canvas.delete("crop_not_found")
-            cropped_img, size = self.get_cropped_image(coords)
-            resized_cropped_img, size = resize(cropped_img, target_width=244, target_height=130)
-            tk_cropped_image = ImageTk.PhotoImage(resized_cropped_img)
+                # Display Cropped Image on Preview
+                self.canvas.delete("crop_not_found")
+                cropped_img, size = self.get_cropped_image(coords)
+                resized_cropped_img, size = resize(cropped_img, target_width=244, target_height=130)
+                tk_cropped_image = ImageTk.PhotoImage(resized_cropped_img)
 
-            if f'{tk_cropped_image}'[:-2] == 'pyimage':
-                width, height = size
+                if f'{tk_cropped_image}'[:-2] == 'pyimage':
+                    width, height = size
 
-                self.cropped_image_visual.delete('all')
-                self.cropped_image_visual.config(width=width, height=height)
-                self.cropped_image_visual.create_image(width/2, height/2, image=tk_cropped_image)
+                    self.cropped_image_visual.delete('all')
+                    self.cropped_image_visual.config(width=width, height=height)
+                    self.cropped_image_visual.create_image(width/2, height/2, image=tk_cropped_image)
+                    
+
+                    self.cropped_image_visual.place(x=(560 - width/2), y= (236 - height/2))
+                    print('placed cropped_image_visual')
+
+                    # Keep a reference to tk_image to prevent garbage collection
+                    self.canvas.tk_cropped_image = tk_cropped_image
                 
 
-                self.cropped_image_visual.place(x=(560 - width/2), y= (236 - height/2))
-                print('placed cropped_image_visual')
-
-                # Keep a reference to tk_image to prevent garbage collection
-                self.canvas.tk_cropped_image = tk_cropped_image
-            
-
-        else:
-            print("Error: Selected item not found in crop dictionary")
+            else:
+                print("Error: Selected item not found in crop dictionary")
 
     def delete_cropping(self):
         selected_item = self.cropped_label_table.focus()
@@ -892,6 +896,7 @@ class img_crop_label:
 
             # Redesign for link table purposes
             self.canvas.delete("crop_not_found")
+            self.cropped_image_visual.place_forget()
 
             self.canvas.itemconfig(self.button_panel_container, text='Group Link Editor')
             self.stage_btn.config(image=self.stage_links_image, command=lambda: print('Stage Links'))
@@ -913,7 +918,7 @@ class img_crop_label:
             )
 
             self.add_mark_btn.config(image=self.connect_image, command=self.confirm_link)
-            self.remove_mark_btn.config(image=self.disconnect_image, command=lambda: print('Delete Connection'))
+            self.remove_mark_btn.config(image=self.disconnect_image, command=self.delete_link)
 
             # remove cropping binds
             self.add_cropped_label_btn.config(state='disabled')
@@ -992,22 +997,73 @@ class img_crop_label:
         link_text = f"{point1.name} - {point2.name}"
         print(link_text)  # Print connected points
 
-    def confirm_link(self):
+    def select_link(self, event):
+        selected_link = self.link_table.focus()
+
+        if selected_link:
+            points = self.link_table.item(selected_link, option="values")
+            link_key = ' - '.join(points)
+
+            if link_key == '-- - (-, -, -, -)':
+
+                for lines in self.links['line']:
+                    self.image_visual.itemconfig(lines, fill='#00DBFF')
+
+                return None
+
+            elif link_key in self.links['links']:
+                line_idx = self.links['links'].index(link_key)
+                selected_line = self.links['line'][line_idx]
+
+                for lines in self.links['line']:
+                    self.image_visual.itemconfig(lines, fill='#00DBFF')
+
+                self.image_visual.itemconfig(selected_line, fill='blue')
+
+                return selected_line
+
+            else:
+                print("Error: Selected item not found in link dictionary")
+                return None
+            
+        else:
+            return None
+        
+
+    def confirm_link(self): # connect
         confirm_link_hex = '#00DBFF'
         self.image_visual.itemconfig(self.current_line, fill=confirm_link_hex)
         self.image_visual.itemconfig(self.start_point.circle, fill=confirm_link_hex)
         self.image_visual.itemconfig(self.end_point.circle, fill=confirm_link_hex)
 
         # Add to links data structure
-        if self.start_point.name not in self.links.keys():
-            self.links[self.start_point.name] = {'points': [self.start_point, self.end_point],
-                                       'line': [self.current_line]}
-        else:
-            self.links[self.start_point.name]['points'].append(self.end_point)
-            self.links[self.start_point.name]['line'].append(self.current_line)
+        self.links['links'].append(f'{self.start_point.name} - {self.end_point.name}')
+        self.links['line'].append(self.current_line)
+
+        tree_add_data([self.start_point.name, self.end_point.name], self.link_table)
 
         print(self.links)
+        print('Added connection')
         self.start_point = self.end_point = None
+
+    def delete_link(self): # disconnect
+        selected_link = self.link_table.focus()
+
+        if selected_link:
+            points = self.link_table.item(selected_link, option="values")
+            link_key = ' - '.join(points)
+
+            if link_key in self.links['links']:
+                line_idx = self.links['links'].index(link_key)
+                selected_line = self.links['line'][line_idx]
+
+                self.image_visual.delete(selected_line)
+
+                self.links['links'].pop(line_idx)
+                self.links['line'].pop(line_idx)
+
+                self.link_table.delete(selected_link)  # Delete the selected row
+
 
     def set_color_to_default(self, points:list):
         for point in points:

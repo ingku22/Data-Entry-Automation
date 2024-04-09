@@ -10,16 +10,6 @@ DEFAULT_DATA = [
     ['whale', 't', 'u']
 ]
 
-
-LABEL_COLUMNS = ['Category', 'Cropped Dimensions']
-LABEL_DATA = [
-    ['Appetizers', '[35,35,35,35]'],
-    ['Drinks', '[35,35,35,35]'],
-    ['Soups', '[35,35,35,35]'],
-    ['Main Dish', '[35,35,35,35]'],
-    ['Specials', '[35,35,35,35]']
-]
-
 # table methods
 
 # Configure Table Data into ttk.Treeview
