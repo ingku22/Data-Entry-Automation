@@ -33,6 +33,7 @@ class img_crop_label:
 
         self.window = Frame(root)
         self.crop_mode = False
+        self.link_mode = False
         self.crop_type = StringVar(value="Items")
 
         self.current_image = None # PhotoImage Tk
@@ -43,6 +44,10 @@ class img_crop_label:
         self.ratio_coordinates = None # (x1 %pos, y1 %pos, %width, %height) for resized image + cropping
         self.coordinates = None # (x1, y1, x2, y2) based on cropped image pixels
 
+        self.current_line = None
+        self.start_point = None
+        self.end_point = None
+
         # MAIN DATA STRUCTURES
         # ===========================
 
@@ -50,7 +55,7 @@ class img_crop_label:
         self.crops_info = {}
 
         # self.links {'Category': 'Options', 'Options', 'Options'}
-        # self.links = {}
+        self.links = {}
 
         # Canvas
         self.canvas = Canvas(
@@ -315,47 +320,54 @@ class img_crop_label:
             height=25.0
         )
 
-        self.button_image_8 = PhotoImage(
+        self.add_crop_image = PhotoImage(
             file=self.relative_to_assets("button_8.png"))
-        self.add_crop_btn = Button(
+        self.connect_image = PhotoImage(
+            file=self.relative_to_assets("button_16.png")
+        )
+
+        self.add_mark_btn = Button(
             self.window,
-            image=self.button_image_8,
+            image=self.add_crop_image,
             borderwidth=0,
             highlightthickness=0,
             command= self.init_cropping,
             relief="flat"
         )
-        self.add_crop_btn.place(
+        self.add_mark_btn.place(
             x=443.0,
             y=98.0,
             width=96.33131408691406,
             height=26.304079055786133
         )
 
-        self.add_crop_tip = Hovertip(self.add_crop_btn,
+        self.add_mark_tip = Hovertip(self.add_mark_btn,
                                      'Activates CROP MODE\nAllows you to crop images. Only active when no current crop is made.\nTo enable the Add Crop Button, ensure that all previous crops have been labelled and added to the table.\n Yellow - Unlabelled\nGreen - Labelled', hover_delay=10)
 
-        self.button_image_9 = PhotoImage(
+        self.delete_crop_image = PhotoImage(
             file=self.relative_to_assets("button_9.png"))
-        self.delete_crop_btn = Button(
+        self.disconnect_image = PhotoImage(
+            file=self.relative_to_assets("button_17.png"))
+
+        self.remove_mark_btn = Button(
             self.window,
-            image=self.button_image_9,
+            image=self.delete_crop_image,
             borderwidth=0,
             highlightthickness=0,
             command=self.delete_cropping,
             relief="flat"
         )
-        self.delete_crop_btn.place(
+        self.remove_mark_btn.place(
             x=543.0,
             y=98.0,
             width=111.0,
             height=25.0
         )
 
-        self.delete_crop_tip = Hovertip(self.delete_crop_btn,
+        self.remove_mark_tip = Hovertip(self.remove_mark_btn,
                                      'Deletes Selected Crop\nOnly active if a crop data is selecte.\nTo enable the Delete Crop Button, ensure that you have selected a crop to delete in the data table below.', hover_delay=10)
 
-        self.canvas.create_text(
+        self.button_panel_container = self.canvas.create_text(
             444.0,
             75.0,
             anchor="nw",
@@ -378,8 +390,8 @@ class img_crop_label:
         #     ['Retail', '[35,35,35,35]']
         # ]
 
-        # Menu Category Data Table
-        self.canvas.create_text(
+        # Data Table Container
+        self.table_container = self.canvas.create_text(
             444.0,
             322.0,
             anchor="nw",
@@ -506,17 +518,19 @@ class img_crop_label:
             y=500.0
         )
 
-        self.button_image_13 = PhotoImage(
+        self.stage_crops_image = PhotoImage(
             file=self.relative_to_assets("button_13.png"))
-        self.stage_crops_btn = Button(
+        self.stage_links_image = PhotoImage(
+            file=self.relative_to_assets("button_14.png")
+        )
+        self.stage_btn = Button(
             self.window,
-            image=self.button_image_13,
+            image=self.stage_crops_image,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_13 clicked"),
             relief="flat"
         )
-        self.stage_crops_btn.place(
+        self.stage_btn.place(
             x=578.0,
             y=323.0,
             width=107.0,
@@ -525,15 +539,14 @@ class img_crop_label:
 
         self.button_image_15 = PhotoImage(
             file=self.relative_to_assets("button_15.png"))
-        self.button_15 = Button(
+        self.toggle_link_crop_btn = Button(
             self.window,
             image=self.button_image_15,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_12 clicked"),
             relief="flat"
         )
-        self.button_15.place(
+        self.toggle_link_crop_btn.place(
             x=599.2535400390625,
             y=68.0,
             width=87.74642944335938,
@@ -575,20 +588,24 @@ class img_crop_label:
             )
 
     def init_button_commands(self):
+        # data and file buttons
         self.browse_files_btn.config(command=self.display_original_img)
         self.button_10.config(command=self.display_original_img)
         self.remove_img_btn.config(command=self.remove_original_img)
-        self.add_cropped_label_btn.config(command=self.verify_cropped_label_data)
-
-        self.download_folder_btn.config(command=lambda dwnld=True: self.saved_cropped_img(download=dwnld))
-        self.stage_crops_btn.config(command=self.saved_cropped_img)
-        
         self.clear_all_btn.config(command=self.clear_all_label_data)
-        self.cropped_label_table.bind("<ButtonRelease-1>", self.select_crop)
-        # self.cropped_label_table.bind("<<TreeviewSelect>>", self.on_treeview_select)
+        self.add_cropped_label_btn.config(command=lambda e=None: self.verify_cropped_label_data(e))
 
-        # self.add_cropped_label_btn.bind('<Return>', lambda event: self.verify_cropped_label_data())
-        # self.window.focus_set()
+        # save and extract buttons
+        self.download_folder_btn.config(command=lambda dwnld=True: self.saved_cropped_img(download=dwnld))
+        self.stage_btn.config(command=self.saved_cropped_img)
+        
+        # link buttons
+        self.toggle_link_crop_btn.config(command=self.toggle_link_mode)
+
+        # binds (when in crop mode only)
+        self.cropped_label_table.bind("<ButtonRelease-1>", self.select_crop)
+        self.group_name_entry.bind("<Return>", self.verify_cropped_label_data)
+
 
     def change_crop_type(self):
         if self.crop_type.get() == 'Items':
@@ -625,7 +642,7 @@ class img_crop_label:
 
     # obtaining/verifying cropped label row data
 
-    def verify_cropped_label_data(self):
+    def verify_cropped_label_data(self, event):
         cropped_label = [self.group_name_entry.get(), str(self.ratio_coordinates)]
 
         if (type(cropped_label[0]) == str) and (type(cropped_label[1]) == str) and type(ast.literal_eval(cropped_label[1])) in [list, tuple]:
@@ -686,6 +703,10 @@ class img_crop_label:
             self.image_visual.delete(stats['plots'][0])
             stats['plots'][1].destroy()
 
+        for links in self.links.values():
+            for lines in links['line']:
+                self.image_visual.delete(lines)
+
         self.crop_not_found = self.canvas.create_image(
             559.0,
             226.0,
@@ -697,57 +718,7 @@ class img_crop_label:
 
         self.crops_info.clear()
 
-
-    def select_crop(self, event):
-        # Highlight Crop on Image
-        selected_item = self.cropped_label_table.focus()
-        if selected_item:
-            groupname = self.cropped_label_table.item(selected_item, option="values")[0]
-
-        if groupname == '--':
-            for r in self.crops_info.values():
-                self.image_visual.itemconfig(r['plots'][0], outline="lime")  # Reset all outlines
-                self.crop_not_found = self.canvas.create_image(
-                    559.0,
-                    226.0,
-                    image=self.image_image_5,
-                    tag=('crop_not_found')
-                )
-                self.cropped_image_visual.place_forget()
-
-        elif groupname in list(self.crops_info.keys()):
-            rect = self.crops_info[groupname]['plots'][0]
-            coords = self.crops_info[groupname]['coordinates']
-
-            for stats in self.crops_info.values():
-                self.image_visual.itemconfig(stats['plots'][0], outline="lime")  # Reset all outlines
-            self.image_visual.itemconfig(rect, outline="blue")   # Set selected outline to blue
-
-            # Display Cropped Image on Preview
-            self.canvas.delete("crop_not_found")
-            cropped_img, size = self.get_cropped_image(coords)
-            resized_cropped_img, size = resize(cropped_img, target_width=244, target_height=130)
-            tk_cropped_image = ImageTk.PhotoImage(resized_cropped_img)
-
-            if f'{tk_cropped_image}'[:-2] == 'pyimage':
-                width, height = size
-
-                self.cropped_image_visual.delete('all')
-                self.cropped_image_visual.config(width=width, height=height)
-                self.cropped_image_visual.create_image(width/2, height/2, image=tk_cropped_image)
-                
-
-                self.cropped_image_visual.place(x=(560 - width/2), y= (236 - height/2))
-                print('placed cropped_image_visual')
-
-                # Keep a reference to tk_image to prevent garbage collection
-                self.canvas.tk_cropped_image = tk_cropped_image
-            
-
-        else:
-            print("Error: Selected item not found in crop dictionary")
-
-    # --------------------------------     
+    # --------------------------------
     # CROPPING FUNCTIONS
     # --------------------------------
     
@@ -831,6 +802,55 @@ class img_crop_label:
         x1, y1, x2, y2 = self.coordinates
         self.image_visual.coords(self.current_crop, x1, y1, x2, y2)
 
+    def select_crop(self, event):
+        # Highlight Crop on Image
+        selected_item = self.cropped_label_table.focus()
+        if selected_item:
+            groupname = self.cropped_label_table.item(selected_item, option="values")[0]
+
+        if groupname == '--':
+            for r in self.crops_info.values():
+                self.image_visual.itemconfig(r['plots'][0], outline="lime")  # Reset all outlines
+                self.crop_not_found = self.canvas.create_image(
+                    559.0,
+                    226.0,
+                    image=self.image_image_5,
+                    tag=('crop_not_found')
+                )
+                self.cropped_image_visual.place_forget()
+
+        elif groupname in list(self.crops_info.keys()):
+            rect = self.crops_info[groupname]['plots'][0]
+            coords = self.crops_info[groupname]['coordinates']
+
+            for stats in self.crops_info.values():
+                self.image_visual.itemconfig(stats['plots'][0], outline="lime")  # Reset all outlines
+            self.image_visual.itemconfig(rect, outline="blue")   # Set selected outline to blue
+
+            # Display Cropped Image on Preview
+            self.canvas.delete("crop_not_found")
+            cropped_img, size = self.get_cropped_image(coords)
+            resized_cropped_img, size = resize(cropped_img, target_width=244, target_height=130)
+            tk_cropped_image = ImageTk.PhotoImage(resized_cropped_img)
+
+            if f'{tk_cropped_image}'[:-2] == 'pyimage':
+                width, height = size
+
+                self.cropped_image_visual.delete('all')
+                self.cropped_image_visual.config(width=width, height=height)
+                self.cropped_image_visual.create_image(width/2, height/2, image=tk_cropped_image)
+                
+
+                self.cropped_image_visual.place(x=(560 - width/2), y= (236 - height/2))
+                print('placed cropped_image_visual')
+
+                # Keep a reference to tk_image to prevent garbage collection
+                self.canvas.tk_cropped_image = tk_cropped_image
+            
+
+        else:
+            print("Error: Selected item not found in crop dictionary")
+
     def delete_cropping(self):
         selected_item = self.cropped_label_table.focus()
         if selected_item:
@@ -853,7 +873,116 @@ class img_crop_label:
                 
                 del self.crops_info[groupname]
 
+    # --------------------------------
+    # CONNECTION FUNCTIONS
+    # --------------------------------
 
+    def toggle_link_mode(self):
+        self.link_mode = not self.link_mode
+        if self.link_mode:
+            print('Link Mode enabled.')
+            self.crop_mode = False
+            self.start_point = None
+            self.end_point = None
+
+            self.canvas.itemconfig(self.button_panel_container, text='Group Link Editor')
+            self.canvas.itemconfig(self.table_container, text='Linked Points')
+            self.stage_btn.config(image=self.stage_links_image, command=lambda: print('Stage Links'))
+            self.cropped_label_table.place_forget()
+
+            self.add_mark_btn.config(image=self.connect_image, command=self.confirm_link)
+            self.remove_mark_btn.config(image=self.disconnect_image, command=lambda: print('Delete Connection'))
+
+            self.add_cropped_label_btn.config(state='disabled')
+            self.image_visual.unbind("<ButtonPress-1>")
+            self.image_visual.unbind("<B1-Motion>")
+            self.image_visual.unbind("<ButtonRelease-1>")
+            self.group_name_entry.unbind("<Return>")
+            self.image_visual.bind("<Button-1>", self.click)
+        else:
+            print('Link mode disabled.')
+            self.crop_mode = True
+
+            self.canvas.itemconfig(self.button_panel_container, text='Label/Image Editor')
+            self.canvas.itemconfig(self.table_container, text='Menu Categories')
+            self.stage_btn.config(image=self.stage_crops_image, command=self.saved_cropped_img)
+
+            self.add_mark_btn.config(image=self.add_crop_image, command=self.init_cropping)
+            self.remove_mark_btn.config(image=self.delete_crop_image, command=self.delete_cropping)
+
+            self.add_cropped_label_btn.config(state='normal')
+            self.image_visual.unbind("<Button-1>")
+            self.image_visual.bind("<ButtonPress-1>", self.start_cropping)
+            self.image_visual.bind("<B1-Motion>", self.draw_rectangle)
+            self.image_visual.bind("<ButtonRelease-1>", self.end_cropping)
+            self.group_name_entry.bind("<Return>", self.verify_cropped_label_data)
+
+    def click(self, event):
+        if self.link_mode and not self.crop_mode:
+
+            for crop_stats in self.crops_info.values():
+                point = crop_stats['plots'][1]
+
+                # selection area of points
+                if event.x >= point.x - 5 and event.x <= point.x + 5 and event.y >= point.y - 5 and event.y <= point.y + 5:
+                    # get point 1
+                    if self.start_point is None:
+                        self.start_point = point
+                        print(f'{point.name} ({point.shape}) selected.')
+                        self.image_visual.itemconfig(self.start_point.circle, fill='cyan')  # Change color of the previously selected point back to red
+
+                    # get point 2
+                    elif self.start_point != point:
+                        print(f'{point.name} ({point.shape}) selected.')
+                        self.image_visual.itemconfig(point.circle, fill='cyan')  # Change point color to red
+                        self.draw_line(self.start_point, point)
+                    break
+
+    def draw_line(self, point1, point2):
+        if (point1.shape == 'Items' and point2.shape == 'Items') or (point1.shape == 'Options' and point2.shape == 'Options'):
+            print("Same type points cannot connect to each other.")
+            self.set_color_to_default([point1, point2])
+            return
+
+        elif point1.name == point2.name:
+            print('Same points cannot connect to each other.')
+            self.set_color_to_default([point1, point2])
+            return 
+
+        # Rearrange the points based on their shapes
+        elif point1.shape == 'Options' and point2.shape == 'Items':
+            self.start_point, self.end_point = point2, point1
+
+        else:
+            self.start_point, self.end_point = point1, point2
+
+        self.current_line = self.image_visual.create_line(point1.x, point1.y, point2.x, point2.y, fill='cyan', width=2)
+        link_text = f"{point1.name} - {point2.name}"
+        print(link_text)  # Print connected points
+
+    def confirm_link(self):
+        confirm_link_hex = '#00DBFF'
+        self.image_visual.itemconfig(self.current_line, fill=confirm_link_hex)
+        self.image_visual.itemconfig(self.start_point.circle, fill=confirm_link_hex)
+        self.image_visual.itemconfig(self.end_point.circle, fill=confirm_link_hex)
+
+        # Add to links data structure
+        if self.start_point.name not in self.links.keys():
+            self.links[self.start_point.name] = {'points': [self.start_point, self.end_point],
+                                       'line': [self.current_line]}
+        else:
+            self.links[self.start_point.name]['points'].append(self.end_point)
+            self.links[self.start_point.name]['line'].append(self.current_line)
+
+        print(self.links)
+        self.start_point = self.end_point = None
+
+    def set_color_to_default(self, points:list):
+        for point in points:
+            if point.shape == 'cluster':
+                self.image_visual.itemconfig(point.circle, fill='light blue')
+            elif point.shape == 'detail':
+                self.image_visual.itemconfig(point.circle, fill='light green')
 
     # ------------------------
     # PAGINATION FUNCTIONS
