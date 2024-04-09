@@ -9,6 +9,9 @@ from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage, Frame, BOTH, EN
 
 from backend.file_methods import obtain_folder_items
 from backend.table_methods import get_ttk_table, tree_add_data, tree_remove_all_data
+from backend.excel_methods import ExcelHandler
+
+excel_handler = ExcelHandler()
 
 class imagetoexcel:
     def relative_to_assets(self, path: str) -> Path:
@@ -141,6 +144,7 @@ class imagetoexcel:
             image=self.button_image_3,
             borderwidth=0,
             highlightthickness=0,
+            command= lambda: excel_handler.changeSheet(-1, self.canvas, self.label),
             relief="flat"
         )
         self.generate_btn.place(
@@ -150,7 +154,7 @@ class imagetoexcel:
             height=49.0
         )
 
-        self.generate_btn.config(state='disabled')
+        # self.generate_btn.config(state='disabled')
 
         self.button_image_4 = PhotoImage(
             file=self.relative_to_assets("button_4.png"))
@@ -175,6 +179,7 @@ class imagetoexcel:
             image=self.button_image_5,
             borderwidth=0,
             highlightthickness=0,
+            command= lambda: excel_handler.changeSheet(-1, self.canvas, self.label, 300, 107.5, 380, 245),
             relief="flat"
         )
         self.prev_sheet_btn.place(
@@ -191,6 +196,7 @@ class imagetoexcel:
             image=self.button_image_6,
             borderwidth=0,
             highlightthickness=0,
+            command= lambda: excel_handler.changeSheet(1, self.canvas, self.label, 300, 107.5, 380, 245),
             relief="flat"
         )
         self.next_sheet_btn.place(
@@ -202,13 +208,13 @@ class imagetoexcel:
 
         self.image_image_5 = PhotoImage(
             file=self.relative_to_assets("image_5.png"))
-        self.image_5 = self.canvas.create_image(
+        self.canvas.create_image(
             491.0,
             93.0,
             image=self.image_image_5
         )
 
-        self.canvas.create_text(
+        self.label = self.canvas.create_text(
             429.0,
             84.0,
             anchor="nw",
@@ -394,14 +400,33 @@ class imagetoexcel:
     # get image path -> ocr -> ocr sorting -> transfer into dataframe -> transfer into treeview -> display treeview
     def generate_excel(self):
         print('Generating Excel File')
+       
+       ## Change these to the data generated from scanning the image
+        data = {
+            "Menu Items": [[0, "Apple Pie", "Delicious Food", 1.2, 0], [1, "Sweet Paprika Chicken McCrispy® (2pc) Special", "Delicious Food", 2.4, 0]],
+            "Linked Dish": [[0,1], [0,6], [1,0], [2,0], [3,2], [4,2], [5,3], [6,4], [6,5]],
+            "Option Groups": [[0, "Sauces", True, False], [1, "Sauces Steak", False, True]],
+            "Linked Options": [[0,0],[0,1],[0,2]],
+            "Options": [[0, "Ranch Sauce", 0.1], [1, "Ketchup", 0.1]]
+        }
 
+
+        columns = { 
+                "Menu Items": ["ItemID", "Menu Items", "Description", "Costs", "Category"],
+                "Linked Dish": ["ItemID", "GroupID"],
+                "Option Groups": ["GroupID", "GroupName", "DropDown", "Mandatory"],
+                "Linked Options": ["GroupID", "OptionID"],
+                "Options": ["OptionID", "OptionTitle", "OptionVal"]
+            }
+        excel_handler.dataframe_to_excel(data, columns)
+        excel_handler.loadSheet(self.canvas, self.label, 300, 107.5, 380, 245)
         # transfer into treeview
-        self.excel_preview_table = get_ttk_table(root=self.window, width=380)
-        self.excel_preview_table.place(
-            x=300.0,
-            y=107.5,
-            height=245
-        )
+        # self.excel_preview_table = get_ttk_table(root=self.window, width=380)
+        # self.excel_preview_table.place(
+        #     x=300.0,
+        #     y=107.5,
+        #     height=245
+        # )
 
         # show statistics of the treeview
         DUMMY_STATS_DATA = '\nGENERATED REPORT\n=================\nCategory: 4\nMenu Items: 12\nOption grp: 3\nOptions: 10\n\nFile Size: 4KB'

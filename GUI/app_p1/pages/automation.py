@@ -8,7 +8,6 @@ import pandas as pd
 from tkinter import ttk, Tk, Canvas, Button, PhotoImage, Frame, filedialog, BOTH, Label
 from backend.automationprocess import automation_process
 from backend.excel_methods import ExcelHandler
-from backend.display_methods import hideElement, showElement 
 
 excel_handler = ExcelHandler()
 
