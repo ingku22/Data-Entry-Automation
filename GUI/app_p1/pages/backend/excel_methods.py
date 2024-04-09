@@ -1,3 +1,5 @@
+import os
+import openpyxl
 from pathlib import Path
 import pandas as pd
 from tkinter import ttk, Frame, filedialog, PhotoImage, Toplevel, Label, Button
@@ -23,11 +25,11 @@ class ExcelHandler:
         self.frame = None
     
 
-    def changeSheet(self, adj, canvas, label):
+    def changeSheet(self, adj, canvas, label, x, y, width, height):
         num_of_sheets = len(self.excel_file.sheet_names)
         if self.sheetNo + adj >= 0 and self.sheetNo + adj < num_of_sheets:
             self.sheetNo += adj
-            self.loadSheet(canvas, label)
+            self.loadSheet(canvas, label, x, y, width, height)
 
     def uploadExcel(self, elements):
         self.file_path = filedialog.askopenfilename(title="Select Excel file",
@@ -36,7 +38,7 @@ class ExcelHandler:
         if self.file_path:
             self.excel_file = pd.ExcelFile(self.file_path)
             elements["automateBtn"]["state"] = "normal"
-            self.loadSheet(elements["canvas"], elements["label"])
+            self.loadSheet(elements["canvas"], elements["label"], 255, 350, 400, 155)
             hideElement(elements["uploadBtn"])
             elements["canvas"].itemconfig(elements["uploadImg"], state='hidden')
             elements["verifyBtn"].place(
@@ -51,31 +53,31 @@ class ExcelHandler:
                 width=80.0,
                 height=38.0
             )
+
+    def dataframe_to_excel(self, data, columns):
+
+        if not os.path.isfile("output.xlsx"):
+            workbook = openpyxl.Workbook()
+            workbook.save("output.xlsx")
+
+        with pd.ExcelWriter("output.xlsx") as writer:
+            for sheet_name in columns:
+                df = pd.DataFrame(data[sheet_name], columns = columns[sheet_name])
+                df.to_excel(writer, sheet_name=sheet_name, index=False)
             
+        self.file_path = "output.xlsx"
+        self.excel_file = pd.ExcelFile(self.file_path)
 
 
 
-    def loadSheet(self, canvas, label):
-        currentSheet = pd.read_excel(self.excel_file, sheet_name=self.sheetNo)
-        excelHeaders = tuple(currentSheet.columns.values)
-        canvas.itemconfig(label, text=f"{self.excel_file.sheet_names[self.sheetNo]:^40}")
+
+    def loadSheet(self, canvas, label, x, y, width, height):
         # Create a Frame to hold the Treeview and Scrollbar
         self.frame = Frame(canvas)
-        self.frame.place(x=255, y=350, width=400, height=155)
+        self.frame.place(x=x, y=y, width=width, height=height)
 
         # Create a TreeView widget
         self.treeview = ttk.Treeview(self.frame)
-
-        # Define some columns
-        self.treeview["columns"] = excelHeaders
-        self.treeview.column("#0", minwidth=0, width=0)
-
-        for header in excelHeaders:
-            self.treeview.heading(header, text=header)
-            self.treeview.column(header, minwidth=0, width=int(400/len(excelHeaders)))
-
-        for values in currentSheet.values:
-            self.treeview.insert("", "end", values=tuple(values))
 
         # Create a vertical scrollbar
         self.vertscrollbar = ttk.Scrollbar(self.frame, orient="vertical", command=self.treeview.yview)
@@ -91,6 +93,22 @@ class ExcelHandler:
         # Configure the TreeView to use the scrollbar
         self.treeview.configure(yscrollcommand=self.vertscrollbar.set)
         self.treeview.configure(xscrollcommand=self.horscrollbar.set)
+
+        currentSheet = pd.read_excel(self.excel_file, sheet_name=self.sheetNo)
+        excelHeaders = tuple(currentSheet.columns.values)
+        canvas.itemconfig(label, text=f"{self.excel_file.slaheet_names[self.sheetNo]}")
+
+        # Define columns
+        self.treeview["columns"] = excelHeaders
+        self.treeview.column("#0", minwidth=0, width=0)
+
+        for header in excelHeaders:
+            self.treeview.heading(header, text=header)
+            self.treeview.column(header, minwidth=0, width=int(400/len(excelHeaders)))
+
+        for values in currentSheet.values:
+            self.treeview.insert("", "end", values=tuple(values))
+        
 
 
     def deleteSheet(self, elements):
@@ -123,36 +141,11 @@ class ExcelHandler:
         close_button = Button(popup, text="Close", command=popup.destroy)
         close_button.pack(pady=10)
 
-    # def validateLinkedSheet(self, sheet, sheet_name):
-    #     match sheet_name:
-    #         case "Linked Category":
-    #             ref_ItemID = pd.read_excel(self.excel_file, sheet_name="Menu Items")["ItemID"]
-    #             ref_CategoryID = pd.read_excel(self.excel_file, sheet_name="Menu Category")["CategoryID"]
-    #             df1 = pd.merge(sheet, ref_ItemID, how="right", on="ItemID")
-    #             df2 = pd.merge(sheet, ref_CategoryID, how="right", on="CategoryID")
-    #         case "Linked Dish":
-    #             ref_ItemID = pd.read_excel(self.excel_file, sheet_name="Menu Items")["ItemID"]
-    #             ref_GroupID = pd.read_excel(self.excel_file, sheet_name="Option Groups")["GroupID"]
-    #             df1 = pd.merge(sheet, ref_ItemID,how="right", on="ItemID")
-    #             df2 = pd.merge(sheet, ref_GroupID, how="right", on="GroupID")
-    #         case "Linked Options":
-    #             ref_GroupID = pd.read_excel(self.excel_file, sheet_name="Option Groups")["GroupID"]
-    #             ref_OptionID = pd.read_excel(self.excel_file, sheet_name="Options")["OptionID"]
-    #             df1 = pd.merge(sheet, ref_GroupID, how="right", on="GroupID")
-    #             df2 = pd.merge(sheet, ref_OptionID, how="right", on="OptionID")
-        
-    #     # Compare dataframes to see what data is excluded
-    #     common_df = pd.merge(df1, df2, how="inner")
-    #     compare_df = pd.merge(sheet, common_df, how="outer", indicator=True)
-    #     excluded_data = compare_df[compare_df["_merge"]=="left_only"].drop(columns=["_merge"])
-    #     if (not excluded_data.empty):
-    #         print(excluded_data)   
- 
     def verifyExcel(self, elements):
         sheet_names = self.excel_file.sheet_names
 
         # Verify Excel sheet names exists
-        format_sheet_names = ["Menu Items", "Linked Category", "Menu Category", "Linked Dish", "Option Groups", "Linked Options", "Options"]
+        format_sheet_names = ["Menu Items", "Linked Dish", "Option Groups", "Linked Options", "Options"]
         for name in format_sheet_names:
             if name not in sheet_names:
                 err_msg = f"Sheet name : '{name}' not found in Excel File"
@@ -160,9 +153,7 @@ class ExcelHandler:
             
         # Verify that sheet columns are accurate
         format_columns_names = {
-                                "Menu Items": ["ItemID", "Menu Items", "Description", "Costs", "Image"],
-                                "Linked Category": ["ItemID", "CategoryID"],
-                                "Menu Category": ["CategoryID", "Category"],
+                                "Menu Items": ["ItemID", "Menu Items", "Description", "Costs", "Category"],
                                 "Linked Dish": ["ItemID", "GroupID"],
                                 "Option Groups": ["GroupID", "GroupName", "DropDown", "Mandatory"],
                                 "Linked Options": ["GroupID", "OptionID"],
@@ -179,11 +170,6 @@ class ExcelHandler:
             # Verify Linked Tables
             if ("Linked" in i):
                 match i:
-                    case "Linked Category":
-                        ref_ItemID = pd.read_excel(self.excel_file, sheet_name="Menu Items")["ItemID"]
-                        ref_CategoryID = pd.read_excel(self.excel_file, sheet_name="Menu Category")["CategoryID"]
-                        df1 = pd.merge(sheet, ref_ItemID, how="right", on="ItemID")
-                        df2 = pd.merge(sheet, ref_CategoryID, how="right", on="CategoryID")
                     case "Linked Dish":
                         ref_ItemID = pd.read_excel(self.excel_file, sheet_name="Menu Items")["ItemID"]
                         ref_GroupID = pd.read_excel(self.excel_file, sheet_name="Option Groups")["GroupID"]

@@ -9,7 +9,6 @@ from tkinter import Canvas, Button, PhotoImage, Frame, BOTH
 from idlelib.tooltip import Hovertip
 from backend.automationprocess import automation_process
 from backend.excel_methods import ExcelHandler
-from backend.display_methods import hideElement, showElement 
 
 excel_handler = ExcelHandler()
 
