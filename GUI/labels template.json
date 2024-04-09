@@ -1,0 +1,42 @@
+{
+        "image 1": {
+            "crop 1.1": {
+                "name": "Some Category",
+                "coords": [1, 2, 3.94, 4],
+                "details": {
+                    "has_header": true,
+                    "has_description": false,
+                    "max_col": 0,
+                    "col_names": [],
+                    "local_options": {
+                        "Add-ons": {
+                            "items": ["Chicken", "Beef", "Salmon", "Bacon"],
+                            "costs": [1.3, 3.7, 4.5, 1.5]
+                        }
+                    }
+                },
+                "option links": {
+                    "option_group_1": {"specs": "Exclude", "items": ["Eggs", "Bacon", "Corn"]},
+                    "option_group_2": {"specs": "Only", "items": ["Eggs", "Bacon", "Corn"]},
+                    "option_group_3": {"specs": "None", "items": []}
+                }
+            },
+
+            "crop 1.2": {
+                "name": "Some Other Category",
+                "coords": [7, 1.2, 4.99, 3.14],
+                "details": {
+                    "has_header": true,
+                    "has_description": false,
+                    "max_col": 3,
+                    "col_names": ["Small", "Medium", "Large"],
+                    "local_options": {}
+                },
+                "option links": {
+                    "option_group_1": {"specs": "Exclude", "items": ["Sea Urchin", "Truffle", "Wagyu", "Premium Pork Chashu"]},
+                    "option_group_2": {"specs": "Only", "items": ["Truffle", "Wagyu", "Premium Pork Chashu"]},
+                    "option_group_3": {"specs": "Exclude", "items": ["Sparrow Sake", "Umeshu", "Full Moon's Eve"]}
+                }
+            }
+        }
+}
