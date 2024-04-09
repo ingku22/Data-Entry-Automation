@@ -555,6 +555,17 @@ class img_crop_label:
             height=18.0
         )
 
+        self.link_action_log = Text(
+            self.window,
+            bd=0,
+            bg="#000000",
+            fg="#FFFFFF",
+            highlightthickness=0,
+            padx=5,
+            pady=5,
+            font=('Khmer UI', 12)
+        )
+
         self.init_button_commands()
 
     # ======================= BACKEND ======================
@@ -897,6 +908,12 @@ class img_crop_label:
             # Redesign for link table purposes
             self.canvas.delete("crop_not_found")
             self.cropped_image_visual.place_forget()
+            self.link_action_log.place(
+                x=20,
+                y=440,
+                width=380,
+                height=90,
+            )
 
             self.canvas.itemconfig(self.button_panel_container, text='Group Link Editor')
             self.stage_btn.config(image=self.stage_links_image, command=lambda: print('Stage Links'))
@@ -931,6 +948,7 @@ class img_crop_label:
             print('Link mode disabled.')
             self.crop_mode = True
 
+            self.link_action_log.place_forget()
             self.link_table.place_forget()
             self.canvas.delete(self.link_container)
             self.crop_not_found = self.canvas.create_image(
@@ -966,11 +984,14 @@ class img_crop_label:
                     if self.start_point is None:
                         self.start_point = point
                         print(f'{point.name} ({point.shape}) selected.')
+                        self.link_action_log.delete('1.0', END)
+                        self.link_action_log.insert(END, f'{point.name} ({point.shape}) selected\n')
                         self.image_visual.itemconfig(self.start_point.circle, fill='cyan')  # Change color of the previously selected point back to red
 
                     # get point 2
                     elif self.start_point != point:
                         print(f'{point.name} ({point.shape}) selected.')
+                        self.link_action_log.insert(END, f'{point.name} ({point.shape}) selected\n')
                         self.image_visual.itemconfig(point.circle, fill='cyan')  # Change point color to red
                         self.draw_line(self.start_point, point)
                     break
@@ -995,6 +1016,7 @@ class img_crop_label:
 
         self.current_line = self.image_visual.create_line(point1.x, point1.y, point2.x, point2.y, fill='cyan', width=2)
         link_text = f"{point1.name} - {point2.name}"
+        self.link_action_log.insert(END, f"--------------------\n{point1.name} -- {point2.name}\n--------------------")
         print(link_text)  # Print connected points
 
     def select_link(self, event):
