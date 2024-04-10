@@ -1,0 +1,51 @@
+{
+    "411 Drink stall_Menu1": {
+        "cold drinks": {
+            "coords": [0.51143, 0.02041, 0.42857, 0.85714],
+            "details": {
+                "has_header": false,
+                    "has_description": false,
+                    "max_col": 1,
+                    "col_names": ["cost"],
+                    "local_options": {
+                        "can drinks range": {
+                            "options": ["Small", "Big"], 
+                            "costs": [1.7, 2]
+                        }
+                    }
+            },
+            "option_links": {
+                "cold options": {"specs": "Exclude", "items": ["can drink"]},
+                "can drinks range": {"specs": "Only", "items": ["can drink"]}
+            }
+        },
+
+        "hot drinks": {
+            "coords": [0.04571, 0.08673, 0.45429, 0.91327],
+            "details": {
+                "has_header": false,
+                    "has_description": false,
+                    "max_col": 1,
+                    "col_names": ["cost"],
+                    "local_options": {}
+            },
+            "option_links": {
+                "hot options": {"specs": "None", "items": []}
+            }
+        }
+    },
+
+    "411 Drink stall_Menu2": {
+        "juice and fruits": {
+            "coords": [0.00595, 0.14667, 0.90476, 0.62333],
+            "details": {
+                "has_header": false,
+                    "has_description": false,
+                    "max_col": 2,
+                    "col_names": ["juice", "fruits"],
+                    "local_options": {}
+            },
+            "option_links": {}
+        }
+    }
+}
