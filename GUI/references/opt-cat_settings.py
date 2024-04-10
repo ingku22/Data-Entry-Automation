@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-from settings import SettingsWindow
+from settings import SettingsWindow, SettingsWindow2
 
 class MainApplication(tk.Tk):
     def __init__(self):
@@ -19,6 +19,7 @@ class MainApplication(tk.Tk):
 
     def open_settings(self):
         settings_window = SettingsWindow(self)
+        settings_window2 = SettingsWindow2(self)
 
     def update_specs_label(self):
         if self.category_group_specs['specs'] != "None" and self.category_group_specs['items'] != ():
