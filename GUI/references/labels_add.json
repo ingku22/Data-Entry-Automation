@@ -1,0 +1,62 @@
+{
+    "Desserts": {
+        "coords": [
+            0.114,
+            0.435,
+            0.319,
+            0.726
+        ],
+        "details": {
+            "has_header": true,
+            "has_description": false,
+            "max_col": 3,
+            "col_names": [
+                "Small",
+                "Medium",
+                "Large"
+            ],
+            "local_options": {
+                "Sundae Toppings": {
+                    "items": [
+                        "No Toppings",
+                        "Waffle",
+                        "Chocolate Waffle"
+                    ],
+                    "costs": [
+                        0,
+                        3,
+                        4.8
+                    ]
+                }
+            }
+        },
+        "option_links": {
+            "Ice Cream Flavours": {
+                "specs": "None",
+                "items": []
+            },
+            "Sugar Level": {
+                "specs": "None",
+                "items": []
+            },
+            "Toppings": {
+                "specs": "Exclude",
+                "items": [
+                    "Blizzy Sundae",
+                    "Sweet Sweet Sundae",
+                    "Luzon Paradise",
+                    "Tropical Deluxe"
+                ]
+            },
+            "Sundae Toppings": {
+                "specs": "Only",
+                "items": [
+                    "Blizzy Sundae",
+                    "Sweet Sweet Sundae",
+                    "Luzon Paradise",
+                    "Tropical Deluxe"
+                ]
+            }
+        }
+    }
+}
