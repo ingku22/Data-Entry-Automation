@@ -5,16 +5,11 @@ from PIL import Image, ImageTk
 import os
 import shutil
 import zipfile
+import json
 from pathlib import Path
 
 
 SUPPORTED_FILE_TYPES = ['png', 'jpg', 'jpeg']
-
-# --------------------------------     
-# File to path FUNCTIONS
-# --------------------------------
-
-
 
 # --------------------------------     
 # ZIP FILE FUNCTIONS
@@ -32,8 +27,34 @@ def zip_n_download(staging_path):
     # Move the zip file to the user's Downloads directory
     downloads_path = Path.home() / "Downloads"
     shutil.move(zip_filename, downloads_path / zip_filename)
+    # os.mkdir(staging_path / 'staging')
     print(f"Zip file saved to: {downloads_path / zip_filename}")
 
+def stage_json_setup(staging_path, dictionary):
+    if os.path.exists(staging_path):
+        with open(f'{staging_path}/label.json', 'w') as label_json:
+            json.dump(dictionary, label_json)
+
+        print('JSON file setup successfully!')
+
+    else:
+        print(f"The staging folder '{staging_path}' does not exist.")
+
+
+def stage_destroy(staging_path):
+    if os.path.exists(staging_path):
+        # Remove all files in the staging folder
+        for filename in os.listdir(staging_path):
+            file_path = os.path.join(staging_path, filename)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print(f"Failed to delete {file_path}. Reason: {e}")
+    else:
+        print(f"The staging folder '{staging_path}' does not exist.")
 # --------------------------------     
 # IMAGE FILE FUNCTIONS
 # --------------------------------

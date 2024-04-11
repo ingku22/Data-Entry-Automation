@@ -5,6 +5,7 @@
 # ---------------------------
 from pathlib import Path
 import ast
+import os
 from PIL import Image, ImageTk
 
 from tkinter import Tk, ttk, messagebox, Canvas, Entry, Text, Button, PhotoImage, Frame, Radiobutton
@@ -12,7 +13,7 @@ from tkinter import BOTH, END, LEFT, StringVar
 from idlelib.tooltip import Hovertip
 from backend.table_methods import get_ttk_table, tree_add_data, tree_remove_all_data
 from backend.points_methods import Point
-from backend.file_methods import display_select_file, resize, zip_n_download
+from backend.file_methods import display_select_file, resize, zip_n_download, stage_json_setup
 
 class img_crop_label:
     def relative_to_assets(self, path: str) -> Path:
@@ -47,6 +48,8 @@ class img_crop_label:
         self.current_line = None
         self.start_point = None
         self.end_point = None
+
+        self.staging_json_labels = {}
 
         # MAIN DATA STRUCTURES
         # ===========================
@@ -634,14 +637,33 @@ class img_crop_label:
 
     # Save Cropped Images
     def saved_cropped_img(self, download=False):
+
+        image_name = '.'.join(self.current_image_path.split('/')[-1].split('.')[:-1])
+        if image_name not in self.staging_json_labels.keys():
+            self.staging_json_labels[image_name] = {}
+
         string_info = 'Items saved into staging folder:\n'
+        os.mkdir(self.STAGING_PATH / image_name)
 
         for groupname, crop_stats in self.crops_info.items():
             coords = crop_stats['coordinates']
+            crop_type = crop_stats['type']
             cropped_img, _ = self.get_cropped_image(coords)
-            cropped_img.save(self.STAGING_PATH / f'{groupname}.jpg')
+            
+            cropped_img.save(self.STAGING_PATH / image_name / f'{groupname}({crop_type}).jpg')
 
-            string_info += f'\n{groupname}.jpg'
+            string_info += f'\n{groupname}({crop_type}).jpg'
+
+            if crop_type == 'Items':
+                self.staging_json_labels[image_name][groupname] = {"coords": coords,
+                                                                   "details": {
+                                                                   "has_header": True,
+                                                                   "has_description": False,
+                                                                   "max_col": 1,
+                                                                   "col_names": ['cost'],
+                                                                   "local_options": {}
+                                                                    }
+                                                                  }
 
         messagebox.showinfo(
             title='SaveInfo',
@@ -649,6 +671,7 @@ class img_crop_label:
         )
 
         if download:
+            stage_json_setup(self.STAGING_PATH, self.staging_json_labels)
             zip_n_download(self.STAGING_PATH)
             messagebox.showinfo(
                 title='SaveInfo',
