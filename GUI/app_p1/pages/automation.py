@@ -183,7 +183,7 @@ class automation:
             image=self.button_image_4,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: excel_handler.changeSheet(-1, self.canvas, self.label),
+            command=lambda: excel_handler.changeSheet(-1, self.canvas, self.label, 255, 350, 400, 155),
             relief="flat"
         )
         self.prev_sheet_btn.place(
@@ -200,7 +200,7 @@ class automation:
             image=self.button_image_5,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: excel_handler.changeSheet(1, self.canvas, self.label),
+            command=lambda: excel_handler.changeSheet(1, self.canvas, self.label, 255, 350, 400, 155),
             relief="flat"
         )
         self.next_sheet_btn.place(
