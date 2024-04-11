@@ -33,6 +33,7 @@ class img_crop_label:
         self.STAGING_PATH = BASE_PATH / STAGING_REL_PATH
 
         self.window = Frame(root)
+        self.root = root
         self.crop_mode = False
         self.link_mode = False
         self.crop_type = StringVar(value="Items")
