@@ -1,4 +1,5 @@
 import os
+import json
 import openpyxl
 from pathlib import Path
 import pandas as pd
@@ -68,6 +69,47 @@ class ExcelHandler:
         self.file_path = "output.xlsx"
         self.excel_file = pd.ExcelFile(self.file_path)
 
+    def label_to_excel(menu_name):
+        i = 0
+        j = 0
+        category_data = []
+        linkedCategory_data = []
+        optionGrp_data = []
+
+        json_path = "GUI/app_p1/assets/staging_dummy/label.json"
+        excel_path = "staging_output.xlsx"
+
+        json_file = open(json_path)
+        json_data = json.load(json_file)
+
+        if not os.path.isfile(excel_path):
+            workbook = openpyxl.Workbook()
+            workbook.save(excel_path)
+
+        for category in json_data[menu_name]:
+            category_data.append([i, category])
+        
+            try: 
+                option_df = pd.read_excel(excel_path, sheet_name="Option Groups")
+            except:
+                option_df = []
+
+            for option_grp in json_data[menu_name][category]["option_links"]:
+                if len(option_df):
+                    if option_grp in option_df["GroupName"].values.tolist():
+                        pass
+                optionGrp_data.append([j, option_grp])
+                linkedCategory_data.append([i, j])
+                j += 1
+            i += 1
+
+        with pd.ExcelWriter(excel_path) as writer:
+            df1 = pd.DataFrame(category_data, columns = ["CategoryID", "Category"])
+            df2 = pd.DataFrame(linkedCategory_data, columns=["CategoryID", "GroupID"])
+            df3 = pd.DataFrame(optionGrp_data, columns=["GroupID", "GroupName"])
+            df1.to_excel(writer, sheet_name="Menu Category", index=False)
+            df2.to_excel(writer, sheet_name="Linked Category", index=False)
+            df3.to_excel(writer, sheet_name="Option Groups", index=False)
 
 
 
