@@ -14,8 +14,10 @@ from idlelib.tooltip import Hovertip
 from backend.table_methods import get_ttk_table, tree_add_data, tree_remove_all_data
 from backend.points_methods import Point
 from backend.file_methods import display_select_file, resize, zip_n_download, stage_json_setup
+from backend.popout import settings_popout
 
 class img_crop_label:
+
     def relative_to_assets(self, path: str) -> Path:
         # Return the full path by joining ASSETS_PATH with the provided relative path
         return self.ASSETS_PATH / Path(path)
@@ -32,6 +34,7 @@ class img_crop_label:
         self.ASSETS_PATH = BASE_PATH / ASSETS_REL_PATH
         self.STAGING_PATH = BASE_PATH / STAGING_REL_PATH
 
+        
         self.window = Frame(root)
         self.root = root
         self.crop_mode = False
@@ -290,14 +293,14 @@ class img_crop_label:
         self.clear_all_tip = Hovertip(self.clear_all_btn,
                                      'Deletes all table data of cropped images.\nCrops on the Image and in the data table will be deleted', hover_delay=10)
 
-        self.button_image_6 = PhotoImage(
+        self.button_image_6 = PhotoImage( # Button 6
             file=self.relative_to_assets("button_6.png"))
         self.zoom_in_btn = Button(
             self.window,
             image=self.button_image_6,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_6 clicked"),
+            command=lambda: settings_popout(self.window),
             relief="flat"
         )
         self.zoom_in_btn.place(
@@ -332,6 +335,7 @@ class img_crop_label:
 
         self.add_mark_btn = Button(
             self.window,
+            background='#0D47A1',
             image=self.add_crop_image,
             borderwidth=0,
             highlightthickness=0,
@@ -635,6 +639,15 @@ class img_crop_label:
             print('Cropping for Option Groups.')
             self.canvas.itemconfig(self.crop_type_text, text='Option Group')
 
+    def get_options_dict(self, groupname):
+        options_dict = {}
+
+        for links in self.links['links']:
+            if links.split(' - ')[0] == groupname:
+                # Change to settings data (default is none)
+                options_dict[links.split(' - ')[1]] = {"specs": "None", "items": []}
+
+        return options_dict
 
     # Save Cropped Images
     def saved_cropped_img(self, download=False):
@@ -663,7 +676,9 @@ class img_crop_label:
                                                                    "max_col": 1,
                                                                    "col_names": ['cost'],
                                                                    "local_options": {}
-                                                                    }
+                                                                    },
+
+                                                                    "option_links": self.get_options_dict(groupname)
                                                                   }
 
         messagebox.showinfo(
