@@ -4,7 +4,6 @@ import openpyxl
 from pathlib import Path
 import pandas as pd
 from tkinter import ttk, Frame, filedialog, PhotoImage, Toplevel, Label, Button
-from backend.display_methods import hideElement, showElement
 
 class ExcelHandler: 
             
@@ -32,28 +31,12 @@ class ExcelHandler:
             self.sheetNo += adj
             self.loadSheet(canvas, label, x, y, width, height)
 
-    def uploadExcel(self, elements):
+    def uploadExcel(self):
         self.file_path = filedialog.askopenfilename(title="Select Excel file",
                                                 filetypes=(("Excel files", "*.xlsx;*.xlsm;*.xml"), ("All files", "*.*")))
 
         if self.file_path:
             self.excel_file = pd.ExcelFile(self.file_path)
-            elements["automateBtn"]["state"] = "normal"
-            self.loadSheet(elements["canvas"], elements["label"], 255, 350, 400, 155)
-            hideElement(elements["uploadBtn"])
-            elements["canvas"].itemconfig(elements["uploadImg"], state='hidden')
-            elements["verifyBtn"].place(
-                x=85.0,
-                y=335.0,
-                width=80.0,
-                height=38.0
-            )
-            elements["deleteBtn"].place(
-                x=85.0,
-                y=435.0,
-                width=80.0,
-                height=38.0
-            )
 
     def dataframe_to_excel(self, data, columns):
 
@@ -153,37 +136,11 @@ class ExcelHandler:
         
 
 
-    def deleteSheet(self, elements):
+    def deleteSheet(self):
         self.excel_file = None
-        elements["canvas"].itemconfig(elements["label"], text="")
-        elements["automateBtn"]["state"] = "disabled"
-        self.frame.destroy()
-        hideElement(elements["verifyBtn"])
-        hideElement(elements["deleteBtn"])
-        showElement(elements["uploadBtn"])
-        elements["canvas"].itemconfig(elements["uploadImg"], state="normal")  
+        self.frame.destroy()  
 
-    def verifyError(self, err_msg, elements):
-        popup = Toplevel()
-        popup.resizable(False, False)
-        popup.title("Error")
-        myFrame = Frame(popup)
-        myFrame.pack(fill="both", expand=True)
-
-        # Calculate position for centering popup window relative to main window
-        window_position_x = elements["canvas"].winfo_rootx() + int(elements["canvas"].winfo_width() / 2 - popup.winfo_reqwidth() / 2 - 100)
-        window_position_y = elements["canvas"].winfo_rooty() + int(elements["canvas"].winfo_height() / 2 - popup.winfo_reqheight() / 2)
-        
-        # Set position for centering popup window
-        popup.geometry("+{}+{}".format(window_position_x, window_position_y))
-        
-        label = Label(popup, text=err_msg)
-        label.pack(pady=20, padx=20)
-    
-        close_button = Button(popup, text="Close", command=popup.destroy)
-        close_button.pack(pady=10)
-
-    def verifyExcel(self, elements):
+    def verifyExcel(self):
         sheet_names = self.excel_file.sheet_names
 
         # Verify Excel sheet names exists
@@ -191,7 +148,7 @@ class ExcelHandler:
         for name in format_sheet_names:
             if name not in sheet_names:
                 err_msg = f"Sheet name : '{name}' not found in Excel File"
-                return self.verifyError(err_msg, elements)
+                return err_msg
             
         # Verify that sheet columns are accurate
         format_columns_names = {
@@ -207,7 +164,7 @@ class ExcelHandler:
             for name in format_columns_names[i]:
                 if name not in sheet_columns:
                     err_msg = f"Column name : '{name}' not found in sheet : '{i}'"
-                    return self.verifyError(err_msg, elements)
+                    return err_msg
                     
             # Verify Linked Tables
             if ("Linked" in i):
@@ -229,7 +186,7 @@ class ExcelHandler:
                 excluded_data = compare_df[compare_df["_merge"]=="left_only"].drop(columns=["_merge"])
                 if (not excluded_data.empty):
                     err_msg = f"Redundant data exists in sheet '{i}'. Data: \n\n{excluded_data.to_string(index=False)}" 
-                    return self.verifyError(err_msg, elements)
+                    return err_msg
             # Verify the data for each column
             else:
                 for column in sheet_columns:
@@ -238,7 +195,7 @@ class ExcelHandler:
                     if data.dtype == "int64":
                             if (not data[data < 0].empty):
                                 err_msg = f"Number cannot be less than 0 in sheet: '{i}'.\nValue: \n{column}\n{data[data < 0].to_string(index=False)}"
-                                return self.verifyError(err_msg, elements)
+                                return err_msg
                     # Validate certain columns
                     match column:
                         case "DropDown":
@@ -248,7 +205,7 @@ class ExcelHandler:
                                     excluded_data.append(value)
                                 if excluded_data:
                                     err_msg = f"Data is in wrong format in sheet: '{i}'.\nValue: \n{column}\n{data[data < 0].to_string(index=False)}"
-                                    return self.verifyError(err_msg, elements)
+                                    return err_msg
 
                         case "Mandatory":
                             excluded_data = []
@@ -257,7 +214,7 @@ class ExcelHandler:
                                     excluded_data.append(value)
                                 if excluded_data:
                                     err_msg = f"Data is in wrong format in sheet: '{i}'.\nValue: \n{column}\n{data[data < 0].to_string(index=False)}"
-                                    return self.verifyError(err_msg, elements)
+                                    return err_msg
 
 
                 

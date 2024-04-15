@@ -5,10 +5,11 @@ from pathlib import Path
 # from tkinter import *
 # Explicit imports to satisfy Flake8
 import pandas as pd
-from tkinter import Canvas, Button, PhotoImage, Frame, BOTH
+from tkinter import Canvas, Button, PhotoImage, Frame, BOTH, Toplevel, Label
 from idlelib.tooltip import Hovertip
 from backend.automationprocess import automation_process
 from backend.excel_methods import ExcelHandler
+from backend.display_methods import hideElement, showElement
 
 excel_handler = ExcelHandler()
 
@@ -144,9 +145,7 @@ class automation:
             image=self.button_image_3,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: excel_handler.uploadExcel({"canvas": self.canvas, "label": self.label, "automateBtn": self.automate_btn, 
-                                                       "uploadImg": self.image_2, "uploadBtn": self.upload_excel_btn, "deleteBtn": self.delete_excel_btn,
-                                                       "verifyBtn": self.verify_btn}),
+            command=lambda: self.uploadExcel(),
             relief="flat"
         )
         self.upload_excel_btn.place(
@@ -238,9 +237,7 @@ class automation:
             image=self.button_image_6,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: excel_handler.deleteSheet({"canvas": self.canvas, "label": self.label, "automateBtn": self.automate_btn, 
-                                                       "uploadImg": self.image_2, "uploadBtn": self.upload_excel_btn, "deleteBtn": self.delete_excel_btn,
-                                                       "verifyBtn": self.verify_btn}),
+            command=lambda: self.deleteExcel(),
             relief="flat"
         )
 
@@ -254,7 +251,7 @@ class automation:
             image=self.button_image_8,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: excel_handler.verifyExcel({"canvas": self.canvas, "verifyBtn": self.verify_btn}),
+            command=lambda: self.verifyExcel(),
             relief="flat"
         )
        
@@ -291,3 +288,57 @@ class automation:
 
     def pack_forget(self):
         self.window.pack_forget()
+
+    def deleteExcel(self):
+        excel_handler.deleteSheet()
+        self.canvas.itemconfig(self.label, text="")
+        self.automate_btn["state"] = "disabled"
+        hideElement(self.verify_btn)
+        hideElement(self.delete_excel_btn)
+        showElement(self.upload_excel_btn)
+        self.canvas.itemconfig(self.image_2, state="normal")
+
+    def uploadExcel(self):
+        excel_handler.uploadExcel()
+        if (excel_handler.file_path):
+            self.automate_btn["state"] = "normal"
+            hideElement(self.upload_excel_btn)
+            self.canvas.itemconfig(self.image_2, state='hidden')
+            self.verify_btn.place(
+                x=85.0,
+                y=335.0,
+                width=80.0,
+                height=38.0
+            )
+            self.delete_excel_btn.place(
+                x=85.0,
+                y=435.0,
+                width=80.0,
+                height=38.0
+            )
+            excel_handler.loadSheet(self.canvas, self.label, 255, 350, 400, 155)
+
+    def verifyExcel(self):
+        err_msg = excel_handler.verifyExcel()
+        if err_msg:
+            popup = Toplevel()
+            popup.resizable(False, False)
+            popup.title("Error")
+            myFrame = Frame(popup)
+            myFrame.pack(fill="both", expand=True)
+
+            # Calculate position for centering popup window relative to main window
+            window_position_x = self.canvas.winfo_rootx() + int(self.canvas.winfo_width() / 2 - popup.winfo_reqwidth() / 2 - 100)
+            window_position_y = self.canvas.winfo_rooty() + int(self.canvas.winfo_height() / 2 - popup.winfo_reqheight() / 2)
+            
+            # Set position for centering popup window
+            popup.geometry("+{}+{}".format(window_position_x, window_position_y))
+            
+            label = Label(popup, text=err_msg)
+            label.pack(pady=20, padx=20)
+        
+            close_button = Button(popup, text="Close", command=popup.destroy)
+            close_button.pack(pady=10)
+        
+        else:
+            print("Okayge")
