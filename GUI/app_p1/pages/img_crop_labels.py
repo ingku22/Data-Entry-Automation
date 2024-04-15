@@ -1118,6 +1118,19 @@ class img_crop_label:
             elif point.shape == 'detail':
                 self.image_visual.itemconfig(point.circle, fill='light green')
 
+
+    # ------------------------
+    # SETTINGS FUNCTIONS
+    # ------------------------
+    def popout_connection_test(self, data):
+        print('Connected to Img_crop_label backend!')
+
+        try:
+            print(f'Data collected from popout: {data}')
+
+        except:
+            print('Data collection failed.')
+
     # ------------------------
     # PAGINATION FUNCTIONS
     # ------------------------
