@@ -144,7 +144,7 @@ class imagetoexcel:
             image=self.button_image_3,
             borderwidth=0,
             highlightthickness=0,
-            command= lambda: excel_handler.changeSheet(-1, self.canvas, self.label),
+            command= lambda: print("Hello"),
             relief="flat"
         )
         self.generate_btn.place(
@@ -439,9 +439,10 @@ class imagetoexcel:
     def remove_excel(self):
         print('Excel Removed.')
         try:
-            self.excel_preview_table.place_forget()
+            excel_handler.deleteSheet()
             self.excel_stat.config(state='normal')
             self.excel_stat.delete(1.0, END)
+            self.canvas.itemconfig(self.label, text="")
 
             self.file_name_entry.delete(0, END)
             self.download_btn.config(state='disabled')
