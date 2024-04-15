@@ -335,6 +335,7 @@ class img_crop_label:
 
         self.add_mark_btn = Button(
             self.window,
+            background='#0D47A1',
             image=self.add_crop_image,
             borderwidth=0,
             highlightthickness=0,
@@ -638,6 +639,15 @@ class img_crop_label:
             print('Cropping for Option Groups.')
             self.canvas.itemconfig(self.crop_type_text, text='Option Group')
 
+    def get_options_dict(self, groupname):
+        options_dict = {}
+
+        for links in self.links['links']:
+            if links.split(' - ')[0] == groupname:
+                # Change to settings data (default is none)
+                options_dict[links.split(' - ')[1]] = {"specs": "None", "items": []}
+
+        return options_dict
 
     # Save Cropped Images
     def saved_cropped_img(self, download=False):
@@ -666,7 +676,9 @@ class img_crop_label:
                                                                    "max_col": 1,
                                                                    "col_names": ['cost'],
                                                                    "local_options": {}
-                                                                    }
+                                                                    },
+
+                                                                    "option_links": self.get_options_dict(groupname)
                                                                   }
 
         messagebox.showinfo(

@@ -239,7 +239,7 @@ class automation:
             borderwidth=0,
             highlightthickness=0,
             command=lambda: excel_handler.deleteSheet({"canvas": self.canvas, "label": self.label, "automateBtn": self.automate_btn, 
-                                                       "uploadImg": self.image_2, "uploadBtn": self.button_3, "deleteBtn": self.delete_excel_btn,
+                                                       "uploadImg": self.image_2, "uploadBtn": self.upload_excel_btn, "deleteBtn": self.delete_excel_btn,
                                                        "verifyBtn": self.verify_btn}),
             relief="flat"
         )
