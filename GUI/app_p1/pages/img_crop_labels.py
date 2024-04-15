@@ -332,6 +332,7 @@ class img_crop_label:
 
         self.add_mark_btn = Button(
             self.window,
+            background='#0D47A1',
             image=self.add_crop_image,
             borderwidth=0,
             highlightthickness=0,
