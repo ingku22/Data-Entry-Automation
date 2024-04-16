@@ -729,6 +729,9 @@ class img_crop_label:
                 tree_add_data(data=cropped_label, table=self.cropped_label_table)
                 self.image_visual.itemconfig(self.crops_info[cropped_label[0]]['plots'][0], outline="lime")
 
+                # Initialize option_links staging
+                self.current_option_links[cropped_label[0]] = {}
+
                 self.group_name_entry.delete(0, END)
                 self.coordinates = None
                 self.ratio_coordinates = None
@@ -773,6 +776,7 @@ class img_crop_label:
             self.cropped_image_visual.place_forget()
 
         self.crops_info.clear()
+        self.current_option_links.clear()
 
     # --------------------------------
     # CROPPING FUNCTIONS
@@ -863,10 +867,18 @@ class img_crop_label:
         if selected_item:
             groupname = self.cropped_label_table.item(selected_item, option="values")[0]
 
+        # Toggled different actions depending on the mode of the application
         if self.link_mode:
-            print(f'Output {groupname} settings')
-            settings_popout(self, groupname)
-        
+            if groupname == '--':
+                pass
+            
+            elif self.crops_info[groupname]['type'] == 'Items':
+                print(f'Output {groupname} settings')
+                self.settings = settings_popout(self, groupname)
+
+            else:
+                print(f'Options {groupname} selected.')
+
         else:
             # Highlight Crop on Image 
             if groupname == '--':
@@ -933,6 +945,7 @@ class img_crop_label:
                 self.cropped_image_visual.place_forget()
                 
                 del self.crops_info[groupname]
+                del self.current_option_links[groupname]
 
     # --------------------------------
     # CONNECTION FUNCTIONS
@@ -1160,7 +1173,7 @@ class img_crop_label:
             self.current_option_links[category] = {}
 
         # add category linkage or initialise new link settings to default
-        if specs:
+        if specs and option != '':
             self.current_option_links[category][option] = specs
         else:
             self.current_option_links[category][option] = {'specs': "None", 'items': []}

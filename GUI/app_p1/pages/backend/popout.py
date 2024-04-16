@@ -13,7 +13,9 @@ class settings_popout():
 
         self.category_group_specs = {'specs': "None", 'items': []}
 
-        # option_links = app.option_links[groupname]
+        self.option_links = app.current_option_links[groupname]
+        self.options = ['-(Please select an option)-'] + list(self.option_links.keys())
+    
         self.window.title(groupname)
 
 
@@ -32,7 +34,7 @@ class settings_popout():
         option_label = tk.Label(option_frame, text="Selected Option Group:")
         option_label.pack(side="left", padx=5, pady=5)
 
-        self.option_menu = tk.OptionMenu(option_frame, self.selected_option_group, *['-(Please select an option)-', 'Option group 1', 'Option group 2', 'Option group 3', 'Local Options'], command=self.option_changed)
+        self.option_menu = tk.OptionMenu(option_frame, self.selected_option_group, *self.options, command=self.option_changed)
         self.option_menu.pack(side="left", padx=5, pady=5)
 
 
