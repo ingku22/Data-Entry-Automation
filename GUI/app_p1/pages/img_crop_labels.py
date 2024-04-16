@@ -48,6 +48,7 @@ class img_crop_label:
         self.current_crop = None
         self.ratio_coordinates = None # (x1 %pos, y1 %pos, %width, %height) for resized image + cropping
         self.coordinates = None # (x1, y1, x2, y2) based on cropped image pixels
+        self.option_links = {}
 
         self.current_line = None
         self.start_point = None
@@ -300,7 +301,7 @@ class img_crop_label:
             image=self.button_image_6,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: settings_popout(self.window),
+            command=lambda: settings_popout(self.window, self),
             relief="flat"
         )
         self.zoom_in_btn.place(
@@ -1146,6 +1147,12 @@ class img_crop_label:
         except:
             print('Data collection failed.')
 
+    def update_specs_label(self, link, specs = None):
+        if specs:
+            self.option_links[link] = specs
+        else:
+            self.option_links[link] = None
+
     # ------------------------
     # PAGINATION FUNCTIONS
     # ------------------------
@@ -1158,5 +1165,3 @@ class img_crop_label:
 
     def pack_forget(self):
         self.window.pack_forget()
-
-
