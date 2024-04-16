@@ -48,7 +48,7 @@ class img_crop_label:
         self.current_crop = None
         self.ratio_coordinates = None # (x1 %pos, y1 %pos, %width, %height) for resized image + cropping
         self.coordinates = None # (x1, y1, x2, y2) based on cropped image pixels
-        self.option_links = {}
+        self.current_option_links = {}
 
         self.current_line = None
         self.start_point = None
@@ -59,7 +59,7 @@ class img_crop_label:
         # MAIN DATA STRUCTURES
         # ===========================
 
-        # self.crops_info {'name': {'plots': ['rectangle', 'circle'], 'type': 'Category', 'coordinates': '[1,2,3,4]'}}
+        # self.crops_info {'name': {'plots': ['rectangle', 'circle'], 'type': 'Items/Options', 'coordinates': '[1,2,3,4]'}}
         self.crops_info = {}
 
         # self.links (Contains links with corresponding line)
@@ -301,7 +301,7 @@ class img_crop_label:
             image=self.button_image_6,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_6"),
+            command=lambda: settings_popout(self),
             relief="flat"
         )
         self.zoom_in_btn.place(
@@ -640,15 +640,15 @@ class img_crop_label:
             print('Cropping for Option Groups.')
             self.canvas.itemconfig(self.crop_type_text, text='Option Group')
 
-    def get_options_dict(self, groupname):
-        options_dict = {}
+    # def get_options_dict(self, groupname):
+    #     options_dict = {}
 
-        for links in self.links['links']:
-            if links.split(' - ')[0] == groupname:
-                # Change to settings data (default is none)
-                options_dict[links.split(' - ')[1]] = {"specs": "None", "items": []}
+    #     for links in self.links['links']:
+    #         if links.split(' - ')[0] == groupname:
+    #             # Change to settings data (default is none)
+    #             options_dict[links.split(' - ')[1]] = {"specs": "None", "items": []}
 
-        return options_dict
+    #     return options_dict
 
     # Save Cropped Images
     def saved_cropped_img(self, download=False):
@@ -718,7 +718,7 @@ class img_crop_label:
                 center_y = (y2 + y1) // 2
                 shape = self.crop_type.get()
                 
-                # Add crops_info crops_info = {'name': {'plots': ['rectangle', 'circle'], 'type': 'Category', 'coordinates': '[1,2,3,4]'}}
+                # Add crops_info crops_info = {'name': {'plots': ['rectangle', 'circle'], 'type': 'Items/Options', 'coordinates': '[1,2,3,4]'}}
                 self.crops_info[cropped_label[0]] = {'plots': [self.current_crop,
                                                                Point(self.image_visual, cropped_label[0], center_x, center_y, shape)], 
                                                      'type': self.crop_type.get(), 
@@ -865,7 +865,6 @@ class img_crop_label:
 
         if self.link_mode:
             print(f'Output {groupname} settings')
-            settings_popout(self, groupname)
         
         else:
             # Highlight Crop on Image 
@@ -1100,12 +1099,16 @@ class img_crop_label:
         self.image_visual.itemconfig(self.end_point.circle, fill=confirm_link_hex)
 
         # Add to links data structure
-        self.links['links'].append(f'{self.start_point.name} - {self.end_point.name}')
+        link_name = f'{self.start_point.name} - {self.end_point.name}'
+        self.links['links'].append(link_name)
         self.links['line'].append(self.current_line)
-
         tree_add_data([self.start_point.name, self.end_point.name], self.link_table)
 
-        print(self.links)
+        # Add data to staging
+        self.update_specs_label(link=link_name)
+
+        # print(self.links)
+        print(self.current_option_links)
         print('Added connection')
         self.start_point = self.end_point = None
 
@@ -1148,11 +1151,18 @@ class img_crop_label:
         except:
             print('Data collection failed.')
 
-    def update_specs_label(self, link, specs = None):
+    def update_specs_label(self, link, specs=None):
+        category, option = link.split(' - ')
+
+        # if category does not exist
+        if category not in self.current_option_links.keys():
+            self.current_option_links[category] = {}
+
+        # add category linkage or initialise new link settings to default
         if specs:
-            self.option_links[link] = specs
+            self.current_option_links[category][option] = specs
         else:
-            self.option_links[link] = None
+            self.current_option_links[category][option] = {'specs': "None", 'items': []}
 
     # ------------------------
     # PAGINATION FUNCTIONS
