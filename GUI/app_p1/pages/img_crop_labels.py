@@ -301,7 +301,7 @@ class img_crop_label:
             image=self.button_image_6,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: settings_popout(self.window, self),
+            command=lambda: print("button_6"),
             relief="flat"
         )
         self.zoom_in_btn.place(
@@ -865,6 +865,7 @@ class img_crop_label:
 
         if self.link_mode:
             print(f'Output {groupname} settings')
+            settings_popout(self, groupname)
         
         else:
             # Highlight Crop on Image 

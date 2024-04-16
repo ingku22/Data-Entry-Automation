@@ -1,9 +1,10 @@
 import tkinter as tk
 
 class settings_popout():
-    def __init__(self, parent, app):
-        self.parent = parent # to get page class functions
-        self.window = tk.Toplevel(parent)
+    def __init__(self, app, groupname):
+        self.parent = app.window # to get page class functions
+        self.window = tk.Toplevel(app.window)
+        self.groupname = groupname
         self.app = app
 
         # Settings variables
@@ -11,6 +12,9 @@ class settings_popout():
         self.selected_option_group = tk.StringVar()
 
         self.category_group_specs = {'specs': "None", 'items': []}
+
+        # option_links = app.option_links[groupname]
+        self.window.title(groupname)
 
 
         # ======== FRONT END =========
