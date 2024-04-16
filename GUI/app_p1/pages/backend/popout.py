@@ -1,9 +1,9 @@
 import tkinter as tk
 
 class settings_popout():
-    def __init__(self, parent, app):
-        self.parent = parent # to get page class functions
-        self.window = tk.Toplevel(parent)
+    def __init__(self, app): # groupname -> get option_links
+        self.parent = app.window # to get page class functions
+        self.window = tk.Toplevel(app.window)
         self.app = app
 
         # Settings variables
