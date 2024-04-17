@@ -13,7 +13,7 @@ class PaginationApp:
         self.root.geometry('700x550')
         
         self.pages = {'404': self.create_404()}
-        self.current_page = 'Home'
+        self.current_page = 'Home'  
         
         self.create_pages()
         self.init_menu()

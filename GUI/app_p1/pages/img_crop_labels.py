@@ -38,7 +38,7 @@ class img_crop_label:
         self.window = Frame(root)
         self.root = root
         self.crop_mode = False
-        self.link_mode = False
+        self.link_mode = True
         self.crop_type = StringVar(value="Items")
 
         self.current_image = None # PhotoImage Tk
@@ -328,16 +328,18 @@ class img_crop_label:
             height=25.0
         )
 
-        self.add_crop_image = PhotoImage(
-            file=self.relative_to_assets("button_8.png"))
+        self.crop_off_image = PhotoImage(
+            file=self.relative_to_assets("Crop_Off.png"))
+        self.crop_on_image = PhotoImage(
+            file=self.relative_to_assets("Crop_On.png"))
         self.connect_image = PhotoImage(
             file=self.relative_to_assets("button_16.png")
         )
 
         self.add_mark_btn = Button(
             self.window,
-            background='#0D47A1',
-            image=self.add_crop_image,
+            background='#000000',
+            image=self.crop_off_image,
             borderwidth=0,
             highlightthickness=0,
             command= self.init_cropping,
@@ -345,7 +347,7 @@ class img_crop_label:
         )
         self.add_mark_btn.place(
             x=443.0,
-            y=98.0,
+            y=96.0,
             width=96.33131408691406,
             height=26.304079055786133
         )
@@ -761,9 +763,12 @@ class img_crop_label:
             self.image_visual.delete(stats['plots'][0])
             stats['plots'][1].destroy()
 
-        for links in self.links.values():
-            for lines in links['line']:
-                self.image_visual.delete(lines)
+        # for links in self.links.values():
+        #     for lines in links['line']:
+        #         self.image_visual.delete(lines)
+    
+        for lines in self.links['line']:
+            self.image_visual.delete(lines)
 
         if not self.link_mode:
             self.crop_not_found = self.canvas.create_image(
@@ -775,8 +780,10 @@ class img_crop_label:
 
             self.cropped_image_visual.place_forget()
 
+        self.image_visual.delete(self.current_crop)
         self.crops_info.clear()
         self.current_option_links.clear()
+        
 
     # --------------------------------
     # CROPPING FUNCTIONS
@@ -806,19 +813,24 @@ class img_crop_label:
 
         if self.crop_mode == False:
             self.crop_mode = True
+            self.add_mark_btn.configure(image=self.crop_on_image)
             print('Crop Mode is On')
 
             self.image_visual.bind("<ButtonPress-1>", self.start_cropping)
             self.image_visual.bind("<B1-Motion>", self.draw_rectangle)
             self.image_visual.bind("<ButtonRelease-1>", self.end_cropping)
+            self.toggle_link_mode()
 
         elif self.crop_mode == True:
             self.crop_mode = False
+            self.add_mark_btn.configure(image=self.crop_off_image)
             print('Crop Mode is Off')
 
+            self.image_visual.delete(self.current_crop)
             self.image_visual.unbind("<ButtonPress-1>")
             self.image_visual.unbind("<B1-Motion>")
             self.image_visual.unbind("<ButtonRelease-1>")
+            self.toggle_link_mode()
 
     def start_cropping(self, event):
         self.start_x = self.image_visual.canvasx(event.x)
@@ -959,40 +971,40 @@ class img_crop_label:
             self.start_point = None
             self.end_point = None
 
-            # Redesign for link table purposes
-            self.canvas.delete("crop_not_found")
-            self.cropped_image_visual.place_forget()
-            self.link_action_log.place(
-                x=20,
-                y=440,
-                width=380,
-                height=90,
-            )
+            # # Redesign for link table purposes
+            # self.canvas.delete("crop_not_found")
+            # self.cropped_image_visual.place_forget()
+            # self.link_action_log.place(
+            #     x=20,
+            #     y=440,
+            #     width=380,
+            #     height=90,
+            # )
 
-            self.canvas.itemconfig(self.button_panel_container, text='Group Link Editor')
-            self.stage_btn.config(image=self.stage_links_image, command=lambda: print('Stage Links'))
-            self.stage_btn.place(x=self.stage_btn.winfo_x(), y=self.stage_btn.winfo_y()-155)
+            # self.canvas.itemconfig(self.button_panel_container, text='Group Link Editor')
+            # self.stage_btn.config(image=self.stage_links_image, command=lambda: print('Stage Links'))
+            # self.stage_btn.place(x=self.stage_btn.winfo_x(), y=self.stage_btn.winfo_y()-155)
 
-            self.link_table.place(
-            x=444.0,
-            y=191.0,
-            height=107
-            )
+            # self.link_table.place(
+            # x=444.0,
+            # y=191.0,
+            # height=107
+            # )
 
-            self.link_container = self.canvas.create_text(
-            444.0,
-            167.0,
-            anchor='nw',
-            text="Linked Points",
-            fill="#8F8F8F",
-            font=("MS Sans Serif", 12)
-            )
+            # self.link_container = self.canvas.create_text(
+            # 444.0,
+            # 167.0,
+            # anchor='nw',
+            # text="Linked Points",
+            # fill="#8F8F8F",
+            # font=("MS Sans Serif", 12)
+            # )
 
-            self.add_mark_btn.config(image=self.connect_image, command=self.confirm_link)
-            self.remove_mark_btn.config(image=self.disconnect_image, command=self.delete_link)
+            # self.add_mark_btn.config(image=self.connect_image, command=self.confirm_link)
+            # self.remove_mark_btn.config(image=self.disconnect_image, command=self.delete_link)
 
             # remove cropping binds
-            self.add_cropped_label_btn.config(state='disabled')
+            # self.add_cropped_label_btn.config(state='disabled')
             self.image_visual.unbind("<ButtonPress-1>")
             self.image_visual.unbind("<B1-Motion>")
             self.image_visual.unbind("<ButtonRelease-1>")
@@ -1012,14 +1024,14 @@ class img_crop_label:
                     tag=('crop_not_found')
                 )
 
-            self.canvas.itemconfig(self.button_panel_container, text='Label/Image Editor')
-            self.stage_btn.config(image=self.stage_crops_image, command=self.saved_cropped_img)
-            self.stage_btn.place(x=self.stage_btn.winfo_x(), y=self.stage_btn.winfo_y()+155)
+            # self.canvas.itemconfig(self.button_panel_container, text='Label/Image Editor')
+            # self.stage_btn.config(image=self.stage_crops_image, command=self.saved_cropped_img)
+            # self.stage_btn.place(x=self.stage_btn.winfo_x(), y=self.stage_btn.winfo_y()+155)
 
-            self.add_mark_btn.config(image=self.add_crop_image, command=self.init_cropping)
-            self.remove_mark_btn.config(image=self.delete_crop_image, command=self.delete_cropping)
+            # self.add_mark_btn.config(image=self.add_crop_image, command=self.init_cropping)
+            # self.remove_mark_btn.config(image=self.delete_crop_image, command=self.delete_cropping)
 
-            self.add_cropped_label_btn.config(state='normal')
+            # self.add_cropped_label_btn.config(state='normal')
             self.image_visual.unbind("<Button-1>")
             self.image_visual.bind("<ButtonPress-1>", self.start_cropping)
             self.image_visual.bind("<B1-Motion>", self.draw_rectangle)
@@ -1048,6 +1060,12 @@ class img_crop_label:
                         self.link_action_log.insert(END, f'{point.name} ({point.shape}) selected\n')
                         self.image_visual.itemconfig(point.circle, fill='cyan')  # Change point color to red
                         self.draw_line(self.start_point, point)
+                        # Add to links data structure
+                        link_name = f'{self.start_point.name} - {self.end_point.name}'
+                        self.links['links'].append(link_name)
+                        self.links['line'].append(self.current_line)
+                        tree_add_data([self.start_point.name, self.end_point.name], self.link_table)
+                        self.start_point = None
                     break
 
     def draw_line(self, point1, point2):
@@ -1111,12 +1129,6 @@ class img_crop_label:
         self.image_visual.itemconfig(self.current_line, fill=confirm_link_hex)
         self.image_visual.itemconfig(self.start_point.circle, fill=confirm_link_hex)
         self.image_visual.itemconfig(self.end_point.circle, fill=confirm_link_hex)
-
-        # Add to links data structure
-        link_name = f'{self.start_point.name} - {self.end_point.name}'
-        self.links['links'].append(link_name)
-        self.links['line'].append(self.current_line)
-        tree_add_data([self.start_point.name, self.end_point.name], self.link_table)
 
         # Add data to staging
         self.update_specs_label(link=link_name)
