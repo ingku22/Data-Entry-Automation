@@ -1060,12 +1060,7 @@ class img_crop_label:
                         self.link_action_log.insert(END, f'{point.name} ({point.shape}) selected\n')
                         self.image_visual.itemconfig(point.circle, fill='cyan')  # Change point color to red
                         self.draw_line(self.start_point, point)
-                        # Add to links data structure
-                        link_name = f'{self.start_point.name} - {self.end_point.name}'
-                        self.links['links'].append(link_name)
-                        self.links['line'].append(self.current_line)
-                        tree_add_data([self.start_point.name, self.end_point.name], self.link_table)
-                        self.start_point = None
+                        self.confirm_link()
                     break
 
     def draw_line(self, point1, point2):
@@ -1129,6 +1124,13 @@ class img_crop_label:
         self.image_visual.itemconfig(self.current_line, fill=confirm_link_hex)
         self.image_visual.itemconfig(self.start_point.circle, fill=confirm_link_hex)
         self.image_visual.itemconfig(self.end_point.circle, fill=confirm_link_hex)
+
+        # Add to links data structure
+        link_name = f'{self.start_point.name} - {self.end_point.name}'
+        self.links['links'].append(link_name)
+        self.links['line'].append(self.current_line)
+        tree_add_data([self.start_point.name, self.end_point.name], self.link_table)
+        self.start_point = None
 
         # Add data to staging
         self.update_specs_label(link=link_name)
