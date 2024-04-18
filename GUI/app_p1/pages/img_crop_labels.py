@@ -628,6 +628,7 @@ class img_crop_label:
 
         # binds (when in crop mode only)
         self.cropped_label_table.bind("<ButtonRelease-1>", self.select_crop)
+        self.cropped_label_table.bind('<Double-Button-1>', self.display_popup)
         self.group_name_entry.bind("<Return>", self.verify_cropped_label_data)
 
         self.link_table.bind("<ButtonRelease-1>", self.select_link)
@@ -759,16 +760,21 @@ class img_crop_label:
 
     def clear_all_label_data(self):
         tree_remove_all_data(table=self.cropped_label_table)
-        for stats in self.crops_info.values():
-            self.image_visual.delete(stats['plots'][0])
-            stats['plots'][1].destroy()
+        # for stats in self.crops_info.values():
+        #     self.image_visual.delete(stats['plots'][0])
+        #     stats['plots'][1].destroy()
 
-        # for links in self.links.values():
-        #     for lines in links['line']:
-        #         self.image_visual.delete(lines)
+        # # print(self.links)
+        # # for links in self.links.values():
+        # #     for lines in links['line']:
+        # #         self.image_visual.delete(lines)
     
-        for lines in self.links['line']:
-            self.image_visual.delete(lines)
+        # # for lines in self.links['line']:
+        # #     self.image_visual.delete(lines)
+        print(self.image_visual.find_all())
+        for i in self.image_visual.find_all()[1:]:
+            self.image_visual.delete(i)
+        print(self.image_visual.find_all())
 
         if not self.link_mode:
             self.crop_not_found = self.canvas.create_image(
@@ -874,11 +880,10 @@ class img_crop_label:
         x1, y1, x2, y2 = self.coordinates
         self.image_visual.coords(self.current_crop, x1, y1, x2, y2)
 
-    def select_crop(self, event):
+    def display_popup(self, event):
         selected_item = self.cropped_label_table.focus()
         if selected_item:
             groupname = self.cropped_label_table.item(selected_item, option="values")[0]
-
         # Toggled different actions depending on the mode of the application
         if self.link_mode:
             if groupname == '--':
@@ -890,6 +895,11 @@ class img_crop_label:
 
             else:
                 print(f'Options {groupname} selected.')
+
+    def select_crop(self, event):
+        selected_item = self.cropped_label_table.focus()
+        if selected_item:
+            groupname = self.cropped_label_table.item(selected_item, option="values")[0]
 
         else:
             # Highlight Crop on Image 
