@@ -901,7 +901,6 @@ class img_crop_label:
         if selected_item:
             groupname = self.cropped_label_table.item(selected_item, option="values")[0]
 
-        else:
             # Highlight Crop on Image 
             if groupname == '--':
                 for r in self.crops_info.values():
