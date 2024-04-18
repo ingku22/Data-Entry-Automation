@@ -559,12 +559,12 @@ class img_crop_label:
             highlightthickness=0,
             relief="flat"
         )
-        self.toggle_link_crop_btn.place(
-            x=599.2535400390625,
-            y=68.0,
-            width=87.74642944335938,
-            height=18.0
-        )
+        # self.toggle_link_crop_btn.place(
+        #     x=599.2535400390625,
+        #     y=68.0,
+        #     width=87.74642944335938,
+        #     height=18.0
+        # )
 
         self.link_action_log = Text(
             self.window,
@@ -604,19 +604,27 @@ class img_crop_label:
 
     def remove_original_img(self):
         self.image_visual.place_forget()
+        self.clear_all_label_data()
+        self.cropped_image_visual.delete('all')
         self.browse_files_btn.place(
-                x=146.0,
-                y=306.0,
-                width=128.0,
-                height=32.0
+            x=146.0,
+            y=306.0,
+            width=128.0,
+            height=32.0
+            )
+        self.crop_not_found = self.canvas.create_image(
+            559.0,
+            226.0,
+            image=self.image_image_5,
+            tag=('crop_not_found')
             )
 
     def init_button_commands(self):
-        # data and file buttons
+        # data and file buttons 
         self.browse_files_btn.config(command=self.display_original_img)
         self.button_10.config(command=self.display_original_img)
-        self.remove_img_btn.config(command=self.remove_original_img)
-        self.clear_all_btn.config(command=self.clear_all_label_data)
+        self.remove_img_btn.config(command=lambda: self.confirmation_popup(self.remove_original_img))
+        self.clear_all_btn.config(command=lambda: self.confirmation_popup(self.clear_all_label_data))
         self.add_cropped_label_btn.config(command=lambda e=None: self.verify_cropped_label_data(e))
 
         # save and extract buttons
@@ -706,47 +714,54 @@ class img_crop_label:
         if (type(cropped_label[0]) == str) and (type(cropped_label[1]) == str) and type(ast.literal_eval(cropped_label[1])) in [list, tuple]:
 
             if len(ast.literal_eval(cropped_label[1])) == 4:
-                # send it to add_data to the update table
-                print('Data Updated')
-                print(cropped_label)
+                # Verify that crop name is unique
+                if cropped_label[0] in self.crops_info.keys():
+                    messagebox.showerror(title='DuplicateError',
+                                    message=f'Crop name: "{cropped_label[0]}" already exists. Please use a different name')
+                else:
+                    # send it to add_data to the update table
+                    print('Data Updated')
+                    print(cropped_label)
 
-                # Prepare the centerpoint dependancies
-                # ==================================
-                # Important Point Attributes
-                # point.circle, point.text -> displayed canvas items
-                # point.connected_points -> gets list of points linked to itself
-                # ==================================
-                x1, y1, x2, y2 = self.coordinates
-                center_x = (x2 + x1) // 2
-                center_y = (y2 + y1) // 2
-                shape = self.crop_type.get()
-                
-                # Add crops_info crops_info = {'name': {'plots': ['rectangle', 'circle'], 'type': 'Items/Options', 'coordinates': '[1,2,3,4]'}}
-                self.crops_info[cropped_label[0]] = {'plots': [self.current_crop,
-                                                               Point(self.image_visual, cropped_label[0], center_x, center_y, shape)], 
-                                                     'type': self.crop_type.get(), 
-                                                     'coordinates': self.ratio_coordinates}
-                print(self.crops_info)
-                self.crops_info[cropped_label[0]]['plots'][1].display()
+                    # Prepare the centerpoint dependancies
+                    # ==================================
+                    # Important Point Attributes
+                    # point.circle, point.text -> displayed canvas items
+                    # point.connected_points -> gets list of points linked to itself
+                    # ==================================
+                    x1, y1, x2, y2 = self.coordinates
+                    center_x = (x2 + x1) // 2
+                    center_y = (y2 + y1) // 2
+                    shape = self.crop_type.get()
+                    
+                    # Add crops_info crops_info = {'name': {'plots': ['rectangle', 'circle'], 'type': 'Items/Options', 'coordinates': '[1,2,3,4]'}}
+                    self.crops_info[cropped_label[0]] = {'plots': [self.current_crop,
+                                                                Point(self.image_visual, cropped_label[0], center_x, center_y, shape)], 
+                                                        'type': self.crop_type.get(), 
+                                                        'coordinates': self.ratio_coordinates}
+                    print(self.crops_info)
+                    self.crops_info[cropped_label[0]]['plots'][1].display()
 
-                tree_add_data(data=cropped_label, table=self.cropped_label_table)
-                self.image_visual.itemconfig(self.crops_info[cropped_label[0]]['plots'][0], outline="lime")
+                    tree_add_data(data=cropped_label, table=self.cropped_label_table)
+                    self.image_visual.itemconfig(self.crops_info[cropped_label[0]]['plots'][0], outline="lime")
 
-                # Initialize option_links staging
-                self.current_option_links[cropped_label[0]] = {}
+                    # Initialize option_links staging
+                    self.current_option_links[cropped_label[0]] = {}
 
-                self.group_name_entry.delete(0, END)
-                self.coordinates = None
-                self.ratio_coordinates = None
-                self.current_crop = None
+                    self.group_name_entry.delete(0, END)
+                    self.coordinates = None
+                    self.ratio_coordinates = None
+                    self.current_crop = None
 
-                # Enable Crop Mode again
-                self.crop_mode = True
-                print('Crop Mode is On')
+                    # Enable Crop Mode again
+                    self.crop_mode = True
+                    print('Crop Mode is On')
 
-                self.image_visual.bind("<ButtonPress-1>", self.start_cropping)
-                self.image_visual.bind("<B1-Motion>", self.draw_rectangle)
-                self.image_visual.bind("<ButtonRelease-1>", self.end_cropping)
+                    self.image_visual.bind("<ButtonPress-1>", self.start_cropping)
+                    self.image_visual.bind("<B1-Motion>", self.draw_rectangle)
+                    self.image_visual.bind("<ButtonRelease-1>", self.end_cropping)
+                    # self.image_visual.bind("<ButtonPress-2>", self.start_dragging)
+                    # self.image_visual.bind("<B2-Motion>", self.drag_image)
 
             else:
                 messagebox.showerror(title='DataFormatError',
@@ -768,13 +783,11 @@ class img_crop_label:
         # # for links in self.links.values():
         # #     for lines in links['line']:
         # #         self.image_visual.delete(lines)
-    
+            
         # # for lines in self.links['line']:
-        # #     self.image_visual.delete(lines)
-        print(self.image_visual.find_all())
+        # #     self.image_visual.delete(lines)``
         for i in self.image_visual.find_all()[1:]:
             self.image_visual.delete(i)
-        print(self.image_visual.find_all())
 
         if not self.link_mode:
             self.crop_not_found = self.canvas.create_image(
@@ -825,6 +838,8 @@ class img_crop_label:
             self.image_visual.bind("<ButtonPress-1>", self.start_cropping)
             self.image_visual.bind("<B1-Motion>", self.draw_rectangle)
             self.image_visual.bind("<ButtonRelease-1>", self.end_cropping)
+            # self.image_visual.bind("<ButtonPress-2>", self.start_dragging)
+            # self.image_visual.bind("<B2-Motion>", self.drag_image)
             self.toggle_link_mode()
 
         elif self.crop_mode == True:
@@ -968,6 +983,18 @@ class img_crop_label:
                 del self.crops_info[groupname]
                 del self.current_option_links[groupname]
 
+    # ------------------------
+    # SCALING/MOVING FUNCTIONS
+    # ------------------------
+
+    def start_dragging(self, event):
+        print("B")
+        self.image_visual.scan_mark(event.x, event.y)
+
+    def drag_image(self, event):
+        print("A")
+        self.image_visual.scan_dragto(event.x, event.y, gain=1)
+
     # --------------------------------
     # CONNECTION FUNCTIONS
     # --------------------------------
@@ -1045,6 +1072,8 @@ class img_crop_label:
             self.image_visual.bind("<ButtonPress-1>", self.start_cropping)
             self.image_visual.bind("<B1-Motion>", self.draw_rectangle)
             self.image_visual.bind("<ButtonRelease-1>", self.end_cropping)
+            # self.image_visual.bind("<ButtonPress-2>", self.start_dragging)
+            # self.image_visual.bind("<B2-Motion>", self.drag_image)
             self.group_name_entry.bind("<Return>", self.verify_cropped_label_data)
 
     def click(self, event):
@@ -1200,6 +1229,15 @@ class img_crop_label:
             self.current_option_links[category][option] = specs
         else:
             self.current_option_links[category][option] = {'specs': "None", 'items': []}
+
+    # ------------------------
+    # CONFIRMATION FUNCTION
+    # ------------------------
+
+    def confirmation_popup(self, function):
+        result = messagebox.askyesno("Confirmation", "Are you sure you want to perform this action?")
+        if result:
+            function()
 
     # ------------------------
     # PAGINATION FUNCTIONS
