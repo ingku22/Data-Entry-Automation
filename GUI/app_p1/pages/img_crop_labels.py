@@ -838,8 +838,9 @@ class img_crop_label:
             self.image_visual.bind("<ButtonPress-1>", self.start_cropping)
             self.image_visual.bind("<B1-Motion>", self.draw_rectangle)
             self.image_visual.bind("<ButtonRelease-1>", self.end_cropping)
-            # self.image_visual.bind("<ButtonPress-2>", self.start_dragging)
-            # self.image_visual.bind("<B2-Motion>", self.drag_image)
+            self.image_visual.bind("<Button-3>", self.start_dragging)
+            self.image_visual.bind("<B3-Motion>", self.drag_image)
+            self.image_visual.bind("<MouseWheel>", self.zoom_in)
             self.toggle_link_mode()
 
         elif self.crop_mode == True:
@@ -851,6 +852,8 @@ class img_crop_label:
             self.image_visual.unbind("<ButtonPress-1>")
             self.image_visual.unbind("<B1-Motion>")
             self.image_visual.unbind("<ButtonRelease-1>")
+            self.image_visual.unbind("<Button-3>")
+            self.image_visual.unbind("<B3-Motion>")
             self.toggle_link_mode()
 
     def start_cropping(self, event):
@@ -983,7 +986,7 @@ class img_crop_label:
                 del self.crops_info[groupname]
                 del self.current_option_links[groupname]
 
-    # ------------------------
+    # ------------------------   
     # SCALING/MOVING FUNCTIONS
     # ------------------------
 
@@ -994,6 +997,14 @@ class img_crop_label:
     def drag_image(self, event):
         print("A")
         self.image_visual.scan_dragto(event.x, event.y, gain=1)
+
+    def zoom_in(self, event):
+        print(event.x, event.y)
+        print(self.current_image    )
+        self.image_visual.scale(self.current_image, event.x, event.y, 0.5, 0.5)
+
+    def zoom_out(self, event):
+        self.image_visual.scale("all", event.x, event.y, -1, -1)
 
     # --------------------------------
     # CONNECTION FUNCTIONS
