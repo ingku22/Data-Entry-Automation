@@ -1229,6 +1229,7 @@ class img_crop_label:
             self.current_option_links[category][option] = specs
         else:
             self.current_option_links[category][option] = {'specs': "None", 'items': []}
+        print(self.current_option_links[category][option])
 
     # ------------------------
     # CONFIRMATION FUNCTION
