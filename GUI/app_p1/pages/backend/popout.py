@@ -13,6 +13,7 @@ class settings_popout():
 
         self.category_group_specs = {'specs': "None", 'items': []}
 
+        print(app.current_option_links)
         self.option_links = app.current_option_links[groupname]
         self.options = ['-(Please select an option)-'] + list(self.option_links.keys())
     
@@ -83,7 +84,8 @@ class settings_popout():
         return self.entry.get()
     
     def option_changed(self, selected_option):
-        print("Selected Option Group:", selected_option)
+        print('selected action')
+        # self.print_specs()
         # Add any actions you want to perform when the option group is changed
 
     def toggle_add_button_state(self):
@@ -111,5 +113,27 @@ class settings_popout():
         items = self.listbox.get(0, tk.END)
         self.category_group_specs['specs'] = selected_option
         self.category_group_specs['items'] = items
-        self.main_app.update_specs_label()
-        self.destroy()
+        selected_option = self.selected_option_group.get()
+        print('Selected Option Group:', selected_option)
+
+        selected_radio = self.selection_spec.get()
+        match selected_radio:
+            case 'None':
+                selected_radio = 'None'
+            case 'Only':
+                selected_radio = 'Only'
+            case 'Exclude':
+                selected_radio = 'Exclude'
+        print('specs: ', selected_radio)
+
+        listbox_items = self.listbox.get(0, tk.END)
+        concatenated_items = []
+        for item in listbox_items:
+            concatenated_items.append(item)
+
+        output = {self.groupname: {selected_option: {"specs": selected_radio, "items":concatenated_items}}}
+        link = f"{self.groupname} - {selected_option}"
+        self.app.update_specs_label(link = link, specs = output)
+        self.window.destroy()
+
+    # Selected Menu Items: {Fried Rice: {size: {specs: Only, items: [basil fried rice, shrimp fried rice]}}}
