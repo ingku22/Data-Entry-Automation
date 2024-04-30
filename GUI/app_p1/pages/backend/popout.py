@@ -84,9 +84,7 @@ class settings_popout():
         return self.entry.get()
     
     def option_changed(self, selected_option):
-        print('selected action')
-        # self.print_specs()
-        # Add any actions you want to perform when the option group is changed
+        print('selected a radio')
 
     def toggle_add_button_state(self):
         if self.selection_spec.get() == "None":

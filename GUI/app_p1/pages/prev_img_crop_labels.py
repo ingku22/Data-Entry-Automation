@@ -16,7 +16,7 @@ from backend.points_methods import Point
 from backend.file_methods import display_select_file, resize, zip_n_download, stage_json_setup
 from backend.popout import settings_popout
 
-class img_crop_label:
+class img_preprocessing:
 
     def relative_to_assets(self, path: str) -> Path:
         # Return the full path by joining ASSETS_PATH with the provided relative path
@@ -98,7 +98,7 @@ class img_crop_label:
             13.0,
             14.0,
             anchor="nw",
-            text="Manual Menu Labeller",
+            text="Image Preprocessing",
             fill="#FFFFFF",
             font=("Inter Bold", 28 * -1)
         )
@@ -1160,7 +1160,7 @@ class img_crop_label:
     # SETTINGS FUNCTIONS
     # ------------------------
     def popout_connection_test(self, data):
-        print('Connected to Img_crop_label backend!')
+        print('Connected to img_preprocessing backend!')
 
         try:
             print(f'Data collected from popout: {data}')

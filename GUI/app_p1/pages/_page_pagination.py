@@ -2,8 +2,8 @@ import tkinter as tk
 import random
 
 # Pages
-from img_crop_labels import img_crop_label
-from imgtoexcel import imagetoexcel
+from img_preprocessings import img_preprocessing
+from excel_generator import excel_generator
 from automation import automation
 
 class PaginationApp:
@@ -42,8 +42,8 @@ class PaginationApp:
             self.pages[item] = frame
 
         # Actual Pages
-        self.pages['Image to Excel Reader'] = imagetoexcel(self.root)
-        self.pages['Crop Toolkit and Viewer'] = img_crop_label(self.root)
+        self.pages['Image to Excel Reader'] = excel_generator(self.root)
+        self.pages['Crop Toolkit and Viewer'] = img_preprocessing(self.root)
         self.pages['Merchant Onboarding'] = automation(self.root)
         
         # print(f'Pages Created: {list(self.pages.keys())}')

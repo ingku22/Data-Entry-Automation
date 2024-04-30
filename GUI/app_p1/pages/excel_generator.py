@@ -13,7 +13,7 @@ from backend.excel_methods import ExcelHandler
 
 excel_handler = ExcelHandler()
 
-class imagetoexcel:
+class excel_generator:
     def relative_to_assets(self, path: str) -> Path:
         # Return the full path by joining ASSETS_PATH with the provided relative path
         return self.ASSETS_PATH / Path(path)
@@ -60,7 +60,7 @@ class imagetoexcel:
             13.0,
             14.0,
             anchor="nw",
-            text="Menu to Excel Converter",
+            text="Excel Generator",
             fill="#FFFFFF",
             font=("Inter Bold", 28 * -1)
         )
