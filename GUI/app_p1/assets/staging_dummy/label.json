@@ -16,7 +16,8 @@
             },
             "option_links": {
                 "cold options": {"specs": "Exclude", "items": ["can drink"]},
-                "can drinks range": {"specs": "Only", "items": ["can drink"]}
+                "can drinks range": {"specs": "Only", "items": ["can drink"]},
+                "hot options": {"specs": "None", "items": []}
             }
         },
 

@@ -294,39 +294,39 @@ class img_preprocessing:
         self.clear_all_tip = Hovertip(self.clear_all_btn,
                                      'Deletes all table data of cropped images.\nCrops on the Image and in the data table will be deleted', hover_delay=10)
 
-        self.button_image_6 = PhotoImage( # Button 6
-            file=self.relative_to_assets("button_6.png"))
-        self.zoom_in_btn = Button(
-            self.window,
-            image=self.button_image_6,
-            borderwidth=0,
-            highlightthickness=0,
-            command=lambda: print("button_6"),
-            relief="flat"
-        )
-        self.zoom_in_btn.place(
-            x=445.0,
-            y=127.0,
-            width=25.0,
-            height=25.0
-        )
+        # self.button_image_6 = PhotoImage( # Button 6
+        #     file=self.relative_to_assets("button_6.png"))
+        # self.zoom_in_btn = Button(
+        #     self.window,
+        #     image=self.button_image_6,
+        #     borderwidth=0,
+        #     highlightthickness=0,
+        #     command=lambda: print("button_6"),
+        #     relief="flat"
+        # )
+        # self.zoom_in_btn.place(
+        #     x=445.0,
+        #     y=127.0,
+        #     width=25.0,
+        #     height=25.0
+        # )
 
-        self.button_image_7 = PhotoImage(
-            file=self.relative_to_assets("button_7.png"))
-        self.zoom_out_btn = Button(
-            self.window,
-            image=self.button_image_7,
-            borderwidth=0,
-            highlightthickness=0,
-            command=lambda: print("button_7 clicked"),
-            relief="flat"
-        )
-        self.zoom_out_btn.place(
-            x=475.0,
-            y=127.0,
-            width=25.0,
-            height=25.0
-        )
+        # self.button_image_7 = PhotoImage(
+        #     file=self.relative_to_assets("button_7.png"))
+        # self.zoom_out_btn = Button(
+        #     self.window,
+        #     image=self.button_image_7,
+        #     borderwidth=0,
+        #     highlightthickness=0,
+        #     command=lambda: print("button_7 clicked"),
+        #     relief="flat"
+        # )
+        # self.zoom_out_btn.place(
+        #     x=475.0,
+        #     y=127.0,
+        #     width=25.0,
+        #     height=25.0
+        # )
 
         self.crop_off_image = PhotoImage(
             file=self.relative_to_assets("Crop_Off.png"))
@@ -348,8 +348,8 @@ class img_preprocessing:
         self.add_mark_btn.place(
             x=443.0,
             y=96.0,
-            width=96.33131408691406,
-            height=26.304079055786133
+            width=110,
+            height=25
         )
 
         self.add_mark_tip = Hovertip(self.add_mark_btn,
@@ -369,8 +369,24 @@ class img_preprocessing:
             relief="flat"
         )
         self.remove_mark_btn.place(
-            x=543.0,
-            y=98.0,
+            x=443.0,
+            y=127.0,
+            width=110,
+            height=25
+        )
+
+        self.disconnect_btn = Button(
+            self.window, 
+            image=self.disconnect_image,
+            borderwidth=0,
+            highlightthickness=0,
+            command=self.delete_link,
+            relief="flat"
+        )
+
+        self.disconnect_btn.place(
+            x=560.0,
+            y=127.0,
             width=111.0,
             height=25.0
         )
@@ -388,16 +404,22 @@ class img_preprocessing:
         )
 
         # Menu Category Data Init
-        LABEL_COLUMNS = ['Category', 'Cropped Dimensions']
-        LABEL_DATA = [['--', '(-, -, -, -)']]
+        LABEL_COLUMNS = ['Category']
+        LABEL_DATA = [['--', '--']]
         LINK_COLUMNS = ['Point1', 'Point2']
 
         # Link Table Container
         self.link_container = None
 
-        self.link_table = get_ttk_table(root=self.window, width=230,
+        self.link_table = get_ttk_table(root=self.window, width=115,
                                         column=LINK_COLUMNS,
                                         data=LABEL_DATA)
+        
+        self.link_table.place(
+            x=560.0,
+            y=346.0,
+            height=130
+        )
 
         # Data Table Container
         self.table_container = self.canvas.create_text(
@@ -409,7 +431,7 @@ class img_preprocessing:
             font=("MS Sans Serif", 12)
         )
 
-        self.cropped_label_table = get_ttk_table(root=self.window , width=230, 
+        self.cropped_label_table = get_ttk_table(root=self.window , width=115, 
                                             column=LABEL_COLUMNS,
                                             data=LABEL_DATA)
         
@@ -423,7 +445,7 @@ class img_preprocessing:
 
 
         self.cropped_label_table.place(
-            x=444.0,
+            x=443.0,
             y=346.0,
             height=130
         )
@@ -431,24 +453,24 @@ class img_preprocessing:
         self.cropped_label_table_tip = Hovertip(self.cropped_label_table, 
                                                 text='Table containing Labelled Crops.\nIn Crop Mode, selecting a table element will return the preview of cropped image.\nIn Link Mode, selecting a table element will open up group link settings', hover_delay=10)
 
-        self.button_image_10 = PhotoImage(
-            file=self.relative_to_assets("button_10.png"))
-        self.button_10 = Button(
-            self.window,
-            image=self.button_image_10,
-            borderwidth=0,
-            highlightthickness=0,
-            relief="flat"
-        )
-        self.button_10.place(
-            x=535.0,
-            y=127.0,
-            width=106.0,
-            height=25.0
-        )
+        # self.button_image_10 = PhotoImage(
+        #     file=self.relative_to_assets("button_10.png"))
+        # self.button_10 = Button(
+        #     self.window,
+        #     image=self.button_image_10,
+        #     borderwidth=0,
+        #     highlightthickness=0,
+        #     relief="flat"
+        # )
+        # self.button_10.place(
+        #     x=575.0,
+        #     y=96.0,
+        #     width=106.0,
+        #     height=25.0
+        # )
 
-        self.button_10_tip = Hovertip(self.button_10,
-                                     'Button to import images.\nImages uploaded will not dissapear unless replaced with another image.', hover_delay=10)
+        # self.button_10_tip = Hovertip(self.button_10,
+        #                              'Button to import images.\nImages uploaded will not dissapear unless replaced with another image.', hover_delay=10)
 
         self.image_image_5 = PhotoImage(
             file=self.relative_to_assets("image_5.png"))
@@ -472,39 +494,39 @@ class img_preprocessing:
         # self.cropped_image_visual.place(x=560-(244/2), y=236-(130/2))
 
 
-        self.button_image_11 = PhotoImage(
-            file=self.relative_to_assets("button_11.png"))
-        self.refresh_btn = Button(
-            self.window,
-            image=self.button_image_11,
-            borderwidth=0,
-            highlightthickness=0,
-            command=lambda: print("button_11 clicked"),
-            relief="flat"
-        )
-        self.refresh_btn.place(
-            x=505.0,
-            y=127.0,
-            width=25.0,
-            height=25.0
-        )
+        # self.button_image_11 = PhotoImage(
+        #     file=self.relative_to_assets("button_11.png"))
+        # self.refresh_btn = Button(
+        #     self.window,
+        #     image=self.button_image_11,
+        #     borderwidth=0,
+        #     highlightthickness=0,
+        #     command=lambda: print("button_11 clicked"),
+        #     relief="flat"
+        # )
+        # self.refresh_btn.place(
+        #     x=505.0,
+        #     y=127.0,
+        #     width=25.0,
+        #     height=25.0
+        # )
 
-        self.refresh_tip = Hovertip(self.refresh_btn,
-                                     'Refreshes the Image to its original fullsize.\nAll Cropped Plots are also displayed on the Image.', hover_delay=10)
+        # self.refresh_tip = Hovertip(self.refresh_btn,
+        #                              'Refreshes the Image to its original fullsize.\nAll Cropped Plots are also displayed on the Image.', hover_delay=10)
 
-        self.button_image_12 = PhotoImage(
-            file=self.relative_to_assets("button_12.png"))
+        self.button_clear_img = PhotoImage(
+            file=self.relative_to_assets("Clear_Img.png"))
         self.remove_img_btn = Button(
             self.window,
-            image=self.button_image_12,
+            image=self.button_clear_img,
             borderwidth=0,
             highlightthickness=0,
             relief="flat"
         )
         self.remove_img_btn.place(
-            x=646.0,
-            y=127.0,
-            width=25.0,
+            x=560.0,
+            y=96.0,
+            width=111,
             height=25.0
         )
 
@@ -622,7 +644,7 @@ class img_preprocessing:
     def init_button_commands(self):
         # data and file buttons 
         self.browse_files_btn.config(command=self.display_original_img)
-        self.button_10.config(command=self.display_original_img)
+        # self.button_10.config(command=self.display_original_img)
         self.remove_img_btn.config(command=lambda: self.confirmation_popup(self.remove_original_img))
         self.clear_all_btn.config(command=lambda: self.confirmation_popup(self.clear_all_label_data))
         self.add_cropped_label_btn.config(command=lambda e=None: self.verify_cropped_label_data(e))
@@ -718,6 +740,10 @@ class img_preprocessing:
                 if cropped_label[0] in self.crops_info.keys():
                     messagebox.showerror(title='DuplicateError',
                                     message=f'Crop name: "{cropped_label[0]}" already exists. Please use a different name')
+                # Verify that crop name is unique
+                elif not cropped_label[0]:
+                    messagebox.showerror(title='EmptyError',
+                                    message=f'Please name your crop')
                 else:
                     # send it to add_data to the update table
                     print('Data Updated')
@@ -775,6 +801,7 @@ class img_preprocessing:
 
     def clear_all_label_data(self):
         tree_remove_all_data(table=self.cropped_label_table)
+        tree_remove_all_data(table=self.link_table)
         # for stats in self.crops_info.values():
         #     self.image_visual.delete(stats['plots'][0])
         #     stats['plots'][1].destroy()
@@ -788,17 +815,14 @@ class img_preprocessing:
         # #     self.image_visual.delete(lines)``
         for i in self.image_visual.find_all()[1:]:
             self.image_visual.delete(i)
-
-        if not self.link_mode:
-            self.crop_not_found = self.canvas.create_image(
+            
+        self.crop_not_found = self.canvas.create_image(
                 559.0,
                 226.0,
                 image=self.image_image_5,
                 tag=('crop_not_found')
-            )
-
-            self.cropped_image_visual.place_forget()
-
+        )
+        self.cropped_image_visual.place_forget()
         self.image_visual.delete(self.current_crop)
         self.crops_info.clear()
         self.current_option_links.clear()
@@ -838,8 +862,6 @@ class img_preprocessing:
             self.image_visual.bind("<ButtonPress-1>", self.start_cropping)
             self.image_visual.bind("<B1-Motion>", self.draw_rectangle)
             self.image_visual.bind("<ButtonRelease-1>", self.end_cropping)
-            # self.image_visual.bind("<ButtonPress-2>", self.start_dragging)
-            # self.image_visual.bind("<B2-Motion>", self.drag_image)
             self.toggle_link_mode()
 
         elif self.crop_mode == True:
@@ -964,7 +986,6 @@ class img_preprocessing:
         selected_item = self.cropped_label_table.focus()
         if selected_item:
             groupname = self.cropped_label_table.item(selected_item, option="values")[0]
-
             if groupname != '--' and groupname in self.crops_info:
                 selected_crop = self.crops_info[groupname]['plots'][0]
                 self.image_visual.delete(selected_crop)
@@ -983,7 +1004,25 @@ class img_preprocessing:
                 del self.crops_info[groupname]
                 del self.current_option_links[groupname]
 
-    # ------------------------
+            for id in self.link_table.get_children():
+                link = self.link_table.item(id)["values"]
+                link_key = ' - '.join(link)
+                print(link_key)
+
+                if link_key in self.links['links'] and groupname in link:
+                    line_idx = self.links['links'].index(link_key)
+                    selected_line = self.links['line'][line_idx]
+
+                    self.image_visual.delete(selected_line)
+
+                    self.links['links'].pop(line_idx)
+                    self.links['line'].pop(line_idx)
+
+                    self.link_table.delete(id)
+
+                
+
+    # ------------------------   
     # SCALING/MOVING FUNCTIONS
     # ------------------------
 
@@ -994,6 +1033,14 @@ class img_preprocessing:
     def drag_image(self, event):
         print("A")
         self.image_visual.scan_dragto(event.x, event.y, gain=1)
+
+    def zoom_in(self, event):
+        print(event.x, event.y)
+        print(self.current_image    )
+        self.image_visual.scale(self.current_image, event.x, event.y, 0.5, 0.5)
+
+    def zoom_out(self, event):
+        self.image_visual.scale("all", event.x, event.y, -1, -1)
 
     # --------------------------------
     # CONNECTION FUNCTIONS
@@ -1050,15 +1097,15 @@ class img_preprocessing:
             print('Link mode disabled.')
             self.crop_mode = True
 
-            self.link_action_log.place_forget()
-            self.link_table.place_forget()
-            self.canvas.delete(self.link_container)
-            self.crop_not_found = self.canvas.create_image(
-                    559.0,
-                    226.0,
-                    image=self.image_image_5,
-                    tag=('crop_not_found')
-                )
+            # self.link_action_log.place_forget()
+            # self.link_table.place_forget()
+            # self.canvas.delete(self.link_container)
+            # self.crop_not_found = self.canvas.create_image(
+            #         559.0,
+            #         226.0,
+            #         image=self.image_image_5,
+            #         tag=('crop_not_found')
+            #     )
 
             # self.canvas.itemconfig(self.button_panel_container, text='Label/Image Editor')
             # self.stage_btn.config(image=self.stage_crops_image, command=self.saved_cropped_img)
@@ -1077,6 +1124,7 @@ class img_preprocessing:
             self.group_name_entry.bind("<Return>", self.verify_cropped_label_data)
 
     def click(self, event):
+        print("A")
         if self.link_mode and not self.crop_mode:
 
             for crop_stats in self.crops_info.values():
@@ -1120,6 +1168,7 @@ class img_preprocessing:
             self.start_point, self.end_point = point1, point2
 
         self.current_line = self.image_visual.create_line(point1.x, point1.y, point2.x, point2.y, fill='cyan', width=2)
+        print(self.current_line)
         link_text = f"{point1.name} - {point2.name}"
         self.link_action_log.insert(END, f"--------------------\n{point1.name} -- {point2.name}\n--------------------")
         print(link_text)  # Print connected points
@@ -1131,7 +1180,7 @@ class img_preprocessing:
             points = self.link_table.item(selected_link, option="values")
             link_key = ' - '.join(points)
 
-            if link_key == '-- - (-, -, -, -)':
+            if link_key == '-- - --':
 
                 for lines in self.links['line']:
                     self.image_visual.itemconfig(lines, fill='#00DBFF')
@@ -1176,14 +1225,18 @@ class img_preprocessing:
         # print(self.links)
         print(self.current_option_links)
         print('Added connection')
+        for id in self.link_table.get_children():
+            link = self.link_table.item(id)["values"]
+            for name in link:
+                print(name) 
         self.start_point = self.end_point = None
 
     def delete_link(self): # disconnect
         selected_link = self.link_table.focus()
-
         if selected_link:
             points = self.link_table.item(selected_link, option="values")
             link_key = ' - '.join(points)
+            print(link_key)
 
             if link_key in self.links['links']:
                 line_idx = self.links['links'].index(link_key)
