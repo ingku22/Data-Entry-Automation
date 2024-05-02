@@ -403,20 +403,16 @@ class imagetoexcel:
        
        ## Change these to the data generated from scanning the image
         data = {
-            "Menu Items": [[0, "Apple Pie", "Delicious Food", 1.2, 0], [1, "Sweet Paprika Chicken McCrispy® (2pc) Special", "Delicious Food", 2.4, 0]],
-            "Linked Dish": [[0,1], [0,6], [1,0], [2,0], [3,2], [4,2], [5,3], [6,4], [6,5]],
-            "Option Groups": [[0, "Sauces", True, False], [1, "Sauces Steak", False, True]],
-            "Linked Options": [[0,0],[0,1],[0,2]],
-            "Options": [[0, "Ranch Sauce", 0.1], [1, "Ketchup", 0.1]]
+            "Items": [["Mala", "Mala", "none", 3.5, ["Soup or Dry", "Spicy Level", "Ingredient"]], ["Grilled Fish", "Grilled Fish", "none", 27.2, ["Fish Flavour", "Grilled Fish Addon"]]],
+            "Option Group": [["Soup or Dry", True, True], ["Spicy Level", True, True]],
+            "Options": [["Soup or Dry", "Dry", 0], ["Soup or Dry", "Soup", 1], ["Spicy Level", "Level 1 - Less Spicy", 0]]
         }
 
 
         columns = { 
-                "Menu Items": ["ItemID", "Menu Items", "Description", "Costs", "Category"],
-                "Linked Dish": ["ItemID", "GroupID"],
-                "Option Groups": ["GroupID", "GroupName", "DropDown", "Mandatory"],
-                "Linked Options": ["GroupID", "OptionID"],
-                "Options": ["OptionID", "OptionTitle", "OptionVal"]
+                "Items": ["Category", "Menu Item", "Description", "Costs", "Option Groups"],
+                "Option Group": ["Option Groups", "Single", "Mandatory"],
+                "Options": ["Option Group", "Option", "Cost"]
             }
         excel_handler.dataframe_to_excel(data, columns)
         excel_handler.loadSheet(self.canvas, self.label, 300, 107.5, 380, 245)
@@ -442,7 +438,7 @@ class imagetoexcel:
             excel_handler.deleteSheet()
             self.excel_stat.config(state='normal')
             self.excel_stat.delete(1.0, END)
-            self.canvas.itemconfig(self.label, text="")
+            self.canvas.itemconfig(self.label, text="") 
 
             self.file_name_entry.delete(0, END)
             self.download_btn.config(state='disabled')

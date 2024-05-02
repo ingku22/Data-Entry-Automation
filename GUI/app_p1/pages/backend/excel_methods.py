@@ -53,11 +53,10 @@ class ExcelHandler:
         self.excel_file = pd.ExcelFile(self.file_path)
 
     def label_to_excel(menu_name):
-        i = 0
-        j = 0
+        i = -1
         category_data = []
-        linkedCategory_data = []
         optionGrp_data = []
+        option_data = []
 
         json_path = "GUI/app_p1/assets/staging_dummy/label.json"
         excel_path = "staging_output.xlsx"
@@ -70,29 +69,33 @@ class ExcelHandler:
             workbook.save(excel_path)
 
         for category in json_data[menu_name]:
-            category_data.append([i, category])
-        
-            try: 
-                option_df = pd.read_excel(excel_path, sheet_name="Option Groups")
-            except:
-                option_df = []
+            matching = False
+            i += 1
+            category_data.append([category, "Menu Item", "none", 3.5])
+            optionGrp_str = ""
 
             for option_grp in json_data[menu_name][category]["option_links"]:
-                if len(option_df):
-                    if option_grp in option_df["GroupName"].values.tolist():
-                        pass
-                optionGrp_data.append([j, option_grp])
-                linkedCategory_data.append([i, j])
-                j += 1
-            i += 1
+                for arr in optionGrp_data:
+                    if option_grp == arr[0]:
+                        matching = True
+                        break
+                optionGrp_str += option_grp + ", "
+                if not matching:
+                    optionGrp_data.append([option_grp, True, True])
+
+            optionGrp_str = optionGrp_str[:-2]
+            category_data[i].append(optionGrp_str)
+
+
+
+        df1 = pd.DataFrame(category_data, columns = ["Category", "Menu Item", "Description", "Costs", "Option Groups"])
+        df2 = pd.DataFrame(optionGrp_data, columns=["Option Group", "Single", "Mandatory"])
+        df3 = pd.DataFrame(columns=["Option Group", "Option", "Cost"])
 
         with pd.ExcelWriter(excel_path) as writer:
-            df1 = pd.DataFrame(category_data, columns = ["CategoryID", "Category"])
-            df2 = pd.DataFrame(linkedCategory_data, columns=["CategoryID", "GroupID"])
-            df3 = pd.DataFrame(optionGrp_data, columns=["GroupID", "GroupName"])
-            df1.to_excel(writer, sheet_name="Menu Category", index=False)
-            df2.to_excel(writer, sheet_name="Linked Category", index=False)
-            df3.to_excel(writer, sheet_name="Option Groups", index=False)
+            df1.to_excel(writer, sheet_name="Items", index=False)
+            df2.to_excel(writer, sheet_name="Option Group", index=False)
+            df3.to_excel(writer, sheet_name="Options", index=False)
 
 
 
