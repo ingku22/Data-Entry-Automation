@@ -97,6 +97,7 @@ class ExcelHandler:
             df2.to_excel(writer, sheet_name="Option Group", index=False)
             df3.to_excel(writer, sheet_name="Options", index=False)
 
+
     def optionlinks_to_excel(menu_name):
         optionlinks_data = []
 
@@ -116,6 +117,9 @@ class ExcelHandler:
 
         with pd.ExcelWriter(excel_path) as writer:
             df4.to_excel(writer, sheet_name="OptionLinks", index=False)
+
+            filtered_df = df4[df4["Specs"] == "Only"]
+            filtered_df.to_excel(writer, sheet_name="FilteredOptionLinks", index=False)
 
 
     def loadSheet(self, canvas, label, x, y, width, height):
