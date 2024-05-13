@@ -98,6 +98,29 @@ class ExcelHandler:
             df3.to_excel(writer, sheet_name="Options", index=False)
 
 
+    def optionlinks_to_excel(menu_name):
+        optionlinks_data = []
+
+        json_path = "GUI/app_p1/assets/staging_dummy/label.json"
+        excel_path = "option_links_output.xlsx"
+
+        json_file = open(json_path)
+        json_data = json.load(json_file)
+
+        for category, category_data in json_data.get(menu_name, {}).items():
+            optionlinks = category_data.get("option_links", {})
+
+            for key, value in optionlinks.items():
+                optionlinks_data.append([category, key, value.get("specs", ""), value.get("items", "")])
+
+        df4 = pd.DataFrame(optionlinks_data, columns = ["Category", "Option Group", "Specs", "Items"])
+
+        with pd.ExcelWriter(excel_path) as writer:
+            df4.to_excel(writer, sheet_name="OptionLinks", index=False)
+
+            filtered_df = df4[df4["Specs"] == "Only"]
+            filtered_df.to_excel(writer, sheet_name="FilteredOptionLinks", index=False)
+
 
     def loadSheet(self, canvas, label, x, y, width, height):
         if not self.frame:

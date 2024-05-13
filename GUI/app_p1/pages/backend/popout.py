@@ -84,7 +84,7 @@ class settings_popout():
         return self.entry.get()
     
     def option_changed(self, selected_option):
-        print('selected a radio')
+        None
 
     def toggle_add_button_state(self):
         if self.selection_spec.get() == "None":

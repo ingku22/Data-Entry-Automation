@@ -40,6 +40,7 @@ class img_preprocessing:
         self.crop_mode = False
         self.link_mode = True
         self.crop_type = StringVar(value="Items")
+        self.popup_window = None
 
         self.current_image = None # PhotoImage Tk
         self.current_image_ref = None # PIL Image (Cropping Reference)
@@ -918,20 +919,22 @@ class img_preprocessing:
         self.image_visual.coords(self.current_crop, x1, y1, x2, y2)
 
     def display_popup(self, event):
-        selected_item = self.cropped_label_table.focus()
-        if selected_item:
-            groupname = self.cropped_label_table.item(selected_item, option="values")[0]
-        # Toggled different actions depending on the mode of the application
-        if self.link_mode:
-            if groupname == '--':
-                pass
+        if self.popup_window is None or not self.popup_window.winfo_exists():
+            selected_item = self.cropped_label_table.focus()
+            if selected_item:
+                groupname = self.cropped_label_table.item(selected_item, option="values")[0]
             
-            elif self.crops_info[groupname]['type'] == 'Items':
-                print(f'Output {groupname} settings')
-                self.settings = settings_popout(self, groupname)
+            # Toggled different actions depending on the mode of the application
+            if self.link_mode:
+                if groupname == '--':
+                    pass
+                
+                elif self.crops_info[groupname]['type'] == 'Items':
+                    print(f'Output {groupname} settings')
+                    self.popup_window = settings_popout(self, groupname)
 
-            else:
-                print(f'Options {groupname} selected.')
+                else:
+                    print(f'Options {groupname} selected.')
 
     def select_crop(self, event):
         selected_item = self.cropped_label_table.focus()
