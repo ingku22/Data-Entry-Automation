@@ -123,48 +123,54 @@ class ExcelHandler:
 
 
     def loadSheet(self, canvas, label, x, y, width, height):
-        # Create a Frame to hold the Treeview and Scrollbar
-        self.frame = Frame(canvas)
-        self.frame.place(x=x, y=y, width=width, height=height)
+        if not self.frame:
+            # Create a Frame to hold the Treeview and Scrollbar
+            self.frame = Frame(canvas)
+            self.frame.place(x=x, y=y, width=width, height=height)
 
-        # Create a TreeView widget
-        self.treeview = ttk.Treeview(self.frame)
+            # Create a TreeView widget
+            self.treeview = ttk.Treeview(self.frame)
 
-        # Create a vertical scrollbar
-        self.vertscrollbar = ttk.Scrollbar(self.frame, orient="vertical", command=self.treeview.yview)
-        self.vertscrollbar.pack(side="right", fill="y")
+            # Create a vertical scrollbar
+            self.vertscrollbar = ttk.Scrollbar(self.frame, orient="vertical", command=self.treeview.yview)
+            self.vertscrollbar.pack(side="right", fill="y")
 
-        # Create a horizontal scrollbar
-        self.horscrollbar = ttk.Scrollbar(self.frame, orient="horizontal", command=self.treeview.xview)
-        self.horscrollbar.pack(side="top", fill="x")
+            # Create a horizontal scrollbar
+            self.horscrollbar = ttk.Scrollbar(self.frame, orient="horizontal", command=self.treeview.xview)
+            self.horscrollbar.pack(side="top", fill="x")
 
-        # Pack the TreeView widget with the scrollbar
-        self.treeview.pack(side="left", fill="y", expand=True)
+            # Pack the TreeView widget with the scrollbar
+            self.treeview.pack(side="left", fill="y", expand=True)
 
-        # Configure the TreeView to use the scrollbar
-        self.treeview.configure(yscrollcommand=self.vertscrollbar.set)
-        self.treeview.configure(xscrollcommand=self.horscrollbar.set)
+            # Configure the TreeView to use the scrollbar
+            self.treeview.configure(yscrollcommand=self.vertscrollbar.set)
+            self.treeview.configure(xscrollcommand=self.horscrollbar.set)
 
-        currentSheet = pd.read_excel(self.excel_file, sheet_name=self.sheetNo)
-        excelHeaders = tuple(currentSheet.columns.values)
-        canvas.itemconfig(label, text=f"{self.excel_file.sheet_names[self.sheetNo]}")
+            currentSheet = pd.read_excel(self.excel_file, sheet_name=self.sheetNo)
+            excelHeaders = tuple(currentSheet.columns.values)
+            canvas.itemconfig(label, text=f"{self.excel_file.sheet_names[self.sheetNo]}")
 
-        # Define columns
-        self.treeview["columns"] = excelHeaders
-        self.treeview.column("#0", minwidth=0, width=0)
+            # Define columns
+            self.treeview["columns"] = excelHeaders
+            self.treeview.column("#0", minwidth=0, width=0)
 
-        for header in excelHeaders:
-            self.treeview.heading(header, text=header)
-            self.treeview.column(header, minwidth=0, width=int(400/len(excelHeaders)))
+            for i in range(len(excelHeaders)):
+                self.treeview.heading(excelHeaders[i], text=excelHeaders[i])
+                if "," in str(currentSheet.values[0][i]):
+                    self.treeview.column(excelHeaders[i], minwidth=0, width=200)
+                else:
+                    self.treeview.column(excelHeaders[i], minwidth=0, width=int(width/len(excelHeaders)))
+                
 
-        for values in currentSheet.values:
-            self.treeview.insert("", "end", values=tuple(values))
+            for values in currentSheet.values:
+                self.treeview.insert("", "end", values=tuple(values))   
         
 
 
     def deleteSheet(self):
         self.excel_file = None
-        self.frame.destroy()  
+        self.frame.destroy()
+        self.frame = None  
 
     def verifyExcel(self):
         sheet_names = self.excel_file.sheet_names

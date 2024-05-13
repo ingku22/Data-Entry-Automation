@@ -403,7 +403,7 @@ class excel_generator:
        
        ## Change these to the data generated from scanning the image
         data = {
-            "Items": [["Mala", "Mala", "none", 3.5, ["Soup or Dry", "Spicy Level", "Ingredient"]], ["Grilled Fish", "Grilled Fish", "none", 27.2, ["Fish Flavour", "Grilled Fish Addon"]]],
+            "Items": [["Mala", "Mala", "none", 3.5, "Soup or Dry,Spicy Level,Ingredient"], ["Grilled Fish", "Grilled Fish", "none", 27.2, "Fish Flavour,Grilled Fish Addon"]],
             "Option Group": [["Soup or Dry", True, True], ["Spicy Level", True, True]],
             "Options": [["Soup or Dry", "Dry", 0], ["Soup or Dry", "Soup", 1], ["Spicy Level", "Level 1 - Less Spicy", 0]]
         }

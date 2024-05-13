@@ -1010,7 +1010,6 @@ class img_preprocessing:
             for id in self.link_table.get_children():
                 link = self.link_table.item(id)["values"]
                 link_key = ' - '.join(link)
-                print(link_key)
 
                 if link_key in self.links['links'] and groupname in link:
                     line_idx = self.links['links'].index(link_key)
