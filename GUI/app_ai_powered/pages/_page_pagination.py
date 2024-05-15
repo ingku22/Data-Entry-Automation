@@ -3,6 +3,7 @@ import random
 
 # Pages
 from automation import automation
+from gemini_excel_generator import gemini_excel_generator
 
 class PaginationApp:
     def __init__(self, root):
@@ -41,6 +42,7 @@ class PaginationApp:
 
         # Actual Pages
         self.pages['Merchant Onboarding'] = automation(self.root)
+        self.pages['Gemini Excel Generator'] = gemini_excel_generator(self.root)
         
         # print(f'Pages Created: {list(self.pages.keys())}')
 
@@ -72,7 +74,7 @@ class PaginationApp:
         toolkits_menu = tk.Menu(menu_bar, tearoff=0)
         menu_bar.add_cascade(label="Automation Toolkits", menu=toolkits_menu)
 
-        toolkits_menu.add_command(label="Image to Excel Reader", command=lambda: self.show_page("Image to Excel Reader"))
+        toolkits_menu.add_command(label="Gemini Excel Generator", command=lambda: self.show_page("Gemini Excel Generator"))
 
         cropping_menu = tk.Menu(toolkits_menu, tearoff=0)
         toolkits_menu.add_cascade(label="Category Cropping Toolkit", menu=cropping_menu)
