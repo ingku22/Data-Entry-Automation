@@ -40,8 +40,6 @@ class PaginationApp:
             self.pages[item] = frame
 
         # Actual Pages
-        self.pages['Image to Excel Reader'] = excel_generator(self.root)
-        self.pages['Crop Toolkit and Viewer'] = img_preprocessing(self.root)
         self.pages['Merchant Onboarding'] = automation(self.root)
         
         # print(f'Pages Created: {list(self.pages.keys())}')
