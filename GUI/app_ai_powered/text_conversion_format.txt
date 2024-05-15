@@ -1,0 +1,52 @@
+TEXT -> EXCEL RULES
+=======================
+
+-------------------------------------------------------
+this is a category
+-------------------------------------------------------
+!Category
+
+-------------------------------------------------------
+this category has a menu item with singular costs
+-------------------------------------------------------
+!Category
+item - cost
+item - cost
+
+-------------------------------------------------------
+this category has a layout with section headers
+-------------------------------------------------------
+!Category [S,M,L]
+item - costS, costM, costL
+item - costS, costM, costL
+item - costS, costM, costL
+item - costS, costM, costL
+
+-------------------------------------------------------
+this category has a linked option group
+-------------------------------------------------------
+!Mala Hotpot [Dry, Soup] (Toppings)
+item - costDry, costSoup
+item - costDry, costSoup
+
+-------------------------------------------------------
+this is how you define an option group
+* mandatory 
+- single 
+= multiple
+-------------------------------------------------------
+?Toppings (-*)
+choice - cost
+choice - cost
+choice - cost
+choice - cost
+
+-------------------------------------------------------
+this is how you add an option group to an item
+-------------------------------------------------------
+!Desserts
+ice cream latte - cost (ice cream flavour)
+banana split - cost
+cherry cheerie - cost (Waffer: 0.3, Pocky: 0.3, Double Scoop: 0.2)
+
+
