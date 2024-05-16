@@ -244,5 +244,5 @@ def automation_process(excelPath):
         wait.until(lambda d: optionGrpBackBtn.is_displayed())
         optionGrpBackBtn.click()
 
-automation_process("Automation Data\Prototype_v2.5a.xlsx")
+# automation_process("Automation Data\Prototype_v2.5a.xlsx")
 

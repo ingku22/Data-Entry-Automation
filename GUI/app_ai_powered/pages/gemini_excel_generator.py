@@ -3,7 +3,7 @@
 
 from pathlib import Path
 # from tkinter import *
-from tkinter import Canvas, Button, PhotoImage, Frame, BOTH, Text, Entry, Label
+from tkinter import Canvas, Button, PhotoImage, Frame, BOTH, Text, Entry, Label, messagebox, END
 from backend.excel_methods import ExcelHandler
 import webbrowser
 
@@ -83,7 +83,7 @@ class gemini_excel_generator:
             image=self.button_image_1,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_1 clicked"),
+            command= lambda: excel_handler.changeSheet(-1, self.canvas, self.label, 300, 107.5, 380, 245),
             relief="flat"
         )
         self.button_1.place(
@@ -100,7 +100,7 @@ class gemini_excel_generator:
             image=self.button_image_2,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_2 clicked"),
+            command=lambda: excel_handler.changeSheet(1, self.canvas, self.label, 300, 107.5, 380, 245),
             relief="flat"
         )
         self.button_2.place(
@@ -118,7 +118,7 @@ class gemini_excel_generator:
             image=self.image_image_4
         )
 
-        self.canvas.create_text(
+        self.label=self.canvas.create_text(
             428.0,
             84.0,
             anchor="nw",
@@ -143,14 +143,14 @@ class gemini_excel_generator:
             458.5,
             image=self.entry_image_1
         )
-        self.entry_1 = Text(
+        self.excel_stat = Text(
             self.canvas,
             bd=0,
             bg="#8D8D8D",
             fg="#000716",
             highlightthickness=0
         )
-        self.entry_1.place(
+        self.excel_stat.place(
             x=320.0,
             y=389.0,
             width=146.0,
@@ -173,14 +173,14 @@ class gemini_excel_generator:
             457.5,
             image=self.entry_image_2
         )
-        self.entry_2 = Entry(
+        self.file_name_entry = Entry(
             self.canvas,
             bd=0,
             bg="#FFFFFF",
             fg="#000716",
             highlightthickness=0
         )
-        self.entry_2.place(
+        self.file_name_entry.place(
             x=500.0,
             y=445.0,
             width=158.0,
@@ -189,7 +189,7 @@ class gemini_excel_generator:
 
         self.button_image_3 = PhotoImage(
             file=self.relative_to_assets("button_3.png"))
-        self.button_3 = Button(
+        self.delete_excel_btn = Button(
             self.window,
             image=self.button_image_3,
             borderwidth=0,
@@ -197,7 +197,7 @@ class gemini_excel_generator:
             command=lambda: print("button_3 clicked"),
             relief="flat"
         )
-        self.button_3.place(
+        self.delete_excel_btn.place(
             x=490.0,
             y=479.0,
             width=60.0,
@@ -206,7 +206,7 @@ class gemini_excel_generator:
 
         self.button_image_4 = PhotoImage(
             file=self.relative_to_assets("button_4.png"))
-        self.button_4 = Button(
+        self.download_btn = Button(
             self.window,
             image=self.button_image_4,
             borderwidth=0,
@@ -214,7 +214,7 @@ class gemini_excel_generator:
             command=lambda: print("button_4 clicked"),
             relief="flat"
         )
-        self.button_4.place(
+        self.download_btn.place(
             x=550.0,
             y=480.0,
             width=118.0,
@@ -254,12 +254,13 @@ class gemini_excel_generator:
             278.5,
             image=self.entry_image_3
         )
-        self.entry_3 = Entry(
+        self.entry_3 = Text(
             self.canvas,
             bd=0,
             bg="#FFFFFF",
             fg="#000716",
-            highlightthickness=0
+            highlightthickness=0,
+            pady=10
         )
         self.entry_3.place(
             x=37.0,
@@ -270,7 +271,7 @@ class gemini_excel_generator:
 
         self.button_image_6 = PhotoImage(
             file=self.relative_to_assets("button_6.png"))
-        self.button_6 = Button(
+        self.generate_btn = Button(
             self.window,
             image=self.button_image_6,
             borderwidth=0,
@@ -278,7 +279,7 @@ class gemini_excel_generator:
             command=lambda: print("button_6 clicked"),
             relief="flat"
         )
-        self.button_6.place(
+        self.generate_btn.place(
             x=21.0,
             y=485.0,
             width=242.0,
@@ -344,12 +345,11 @@ class gemini_excel_generator:
             height=31.0
         )
 
+        self.init_button_commands()
+
     def copy_to_clipboard(self):
-        text_to_copy = self.entry_3.get()
-        self.window.clipboard_clear()
+        text_to_copy = "eat shit"
         self.window.clipboard_append(text_to_copy)
-        self.window.update()
-        self.entry_3.delete(0, 'end')
 
         # Hide button 5
         self.button_5.place_forget()
@@ -381,6 +381,78 @@ class gemini_excel_generator:
             width=87.0,
             height=21.0
         )
+
+    # ============================== DIRECT BACKEND ===============================
+    # init functions
+    def init_button_commands(self):
+        self.generate_btn.config(command=self.generate_excel)
+        self.delete_excel_btn.config(command=self.remove_excel)
+        self.download_btn.config(command=self.download_excel)
+
+    # Excel Function
+    # Methodology (per image in images):
+    # get image path -> ocr -> ocr sorting -> transfer into dataframe -> transfer into treeview -> display treeview
+    def generate_excel(self):
+        print('Generating Excel File')
+       
+       ## Change these to the data generated from scanning the image
+        data = {
+            "Items": [["Mala", "Mala", "none", 3.5, "Soup or Dry,Spicy Level,Ingredient"], ["Grilled Fish", "Grilled Fish", "none", 27.2, "Fish Flavour,Grilled Fish Addon"]],
+            "Option Group": [["Soup or Dry", True, True], ["Spicy Level", True, True]],
+            "Options": [["Soup or Dry", "Dry", 0], ["Soup or Dry", "Soup", 1], ["Spicy Level", "Level 1 - Less Spicy", 0]]
+        }
+
+
+        columns = { 
+                "Items": ["Category", "Menu Item", "Description", "Costs", "Option Groups"],
+                "Option Group": ["Option Groups", "Single", "Mandatory"],
+                "Options": ["Option Group", "Option", "Cost"]
+            }
+        excel_handler.dataframe_to_excel(data, columns)
+        excel_handler.loadSheet(self.canvas, self.label, 300, 107.5, 380, 245)
+        # transfer into treeview
+        # self.excel_preview_table = get_ttk_table(root=self.window, width=380)
+        # self.excel_preview_table.place(
+        #     x=300.0,
+        #     y=107.5,
+        #     height=245
+        # )
+
+        # show statistics of the treeview
+        DUMMY_STATS_DATA = '\nGENERATED REPORT\n=================\nCategory: 4\nMenu Items: 12\nOption grp: 3\nOptions: 10\n\nFile Size: 4KB'
+        
+        self.excel_stat.delete(1.0, END)
+        self.excel_stat.insert(END, DUMMY_STATS_DATA)
+        self.excel_stat.config(state='disabled')
+        self.download_btn.config(state='normal')
+
+    def remove_excel(self):
+        print('Excel Removed.')
+        try:
+            excel_handler.deleteSheet()
+            self.excel_stat.config(state='normal')
+            self.excel_stat.delete(1.0, END)
+            self.canvas.itemconfig(self.label, text="") 
+
+            self.file_name_entry.delete(0, END)
+            self.download_btn.config(state='disabled')
+        except:
+            messagebox.showerror(title='AttributeError', message='application has no attribute "excel_preview_table".')
+
+
+    def download_excel(self):
+        set_file_name = self.file_name_entry.get().lstrip().rstrip()
+
+        # Check for missing values
+        if set_file_name not in ['', None]:
+            # download the file
+            self.excel_name = set_file_name
+            print(f'File Name: {self.excel_name}')
+
+        else:
+            messagebox.showerror(title='DataFormatError',
+                                    message='Please name your excel file.')
+
 
     # Page Functions
     def run(self):
