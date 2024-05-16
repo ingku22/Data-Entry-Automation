@@ -3,8 +3,9 @@
 
 from pathlib import Path
 # from tkinter import *
-from tkinter import Canvas, Button, PhotoImage, Frame, BOTH, Text, Entry
+from tkinter import Canvas, Button, PhotoImage, Frame, BOTH, Text, Entry, Label
 from backend.excel_methods import ExcelHandler
+import webbrowser
 
 excel_handler = ExcelHandler()
 
@@ -236,7 +237,7 @@ class gemini_excel_generator:
             image=self.button_image_5,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_5 clicked"),
+            command=self.copy_to_clipboard,
             relief="flat"
         )
         self.button_5.place(
@@ -244,7 +245,7 @@ class gemini_excel_generator:
             y=86.0,
             width=87.0,
             height=21.0
-        )
+        )   
 
         self.entry_image_3 = PhotoImage(
             file=self.relative_to_assets("entry_3.png"))
@@ -299,7 +300,7 @@ class gemini_excel_generator:
             image=self.button_image_7,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_7 clicked"),
+            command=lambda: webbrowser.open("https://gemini.google.com/app"),
             relief="flat"
         )
         self.button_7.place(
@@ -341,6 +342,44 @@ class gemini_excel_generator:
             y=447.0,
             width=130.0,
             height=31.0
+        )
+
+    def copy_to_clipboard(self):
+        text_to_copy = self.entry_3.get()
+        self.window.clipboard_clear()
+        self.window.clipboard_append(text_to_copy)
+        self.window.update()
+        self.entry_3.delete(0, 'end')
+
+        # Hide button 5
+        self.button_5.place_forget()
+
+        # Label to notify that text has been copied
+        self.copied_label = Label(
+            self.window,
+            text="Copied!",
+            bg="#313131",
+            fg="#FFFFFF"
+        )
+        self.copied_label.place(
+            x=164.0,
+            y=82.0,
+            width=100.0,
+            height=21.0
+        )
+
+        # Revert the button back to "Copy Prompt" after 1s
+        self.window.after(1000, self.revert_button)
+
+    def revert_button(self):
+        self.copied_label.destroy()
+
+        # Place back the button
+        self.button_5.place(
+            x=174.0,
+            y=86.0,
+            width=87.0,
+            height=21.0
         )
 
     # Page Functions
