@@ -1,0 +1,28 @@
+!Larger Plates (Sides)
+Nichols Smoked Chicken Breast - 36
+Scottsdale Pork Belly - 36
+Wild Clover Lamb - 40
+Rannoch Farm Quail - 37
+Pan Roasted Fish - 37
+Braised Lentils - 30
+
+?Doneness (-*)
+Medium Rare - 0
+Medium - 0
+Well Done - 0
+Overcooked - 0
+Burnt - 0
+
+!Steak Plates (Sides)
+300g Porterhouse - 36 (Doneness)
+300g Scotch Fillet - 42
+220g Eye Fillet - 42 
+
+?Sides (=*)
+French Fries - 1
+Garden Veggie - 1
+Coleslaw - 1
+Mashed Potato - 1
+Tasty Rice - 1
+
+

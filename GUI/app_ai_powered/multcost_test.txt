@@ -1,0 +1,13 @@
+!Rice Bowls [S,M,L]
+Braised Pork Rice - 3, 5, 9
+Honey Chicken Rice - 2.5, 4, 5.5
+Beef Bowl - 3, 5, 9
+Katsu Curry Rice - 4, 8, 12 (Choice of Meat)
+Briyani Rice - 3.5, 5, 9
+
+
+
+?Choice of Meat (-*)
+Chicken - 0
+Pork - 0
+Seafood - 0
