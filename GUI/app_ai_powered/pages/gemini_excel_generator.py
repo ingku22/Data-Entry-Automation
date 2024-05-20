@@ -349,7 +349,9 @@ class gemini_excel_generator:
 
     def copy_to_clipboard(self):
         text_to_copy = "eat shit"
+        self.window.clipboard_clear()
         self.window.clipboard_append(text_to_copy)
+        self.window.update()
 
         # Hide button 5
         self.button_5.place_forget()
