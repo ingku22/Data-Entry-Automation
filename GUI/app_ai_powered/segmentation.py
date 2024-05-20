@@ -36,13 +36,25 @@ def convert_text(text_chunk):
         # -----------------------------------------
         elif each_line[0] == '!': # define category
             # Breakdown category group line into affected option groups and section headers
-            category_match = re.search(r'!(\w+(?:\s+\w+)*)', each_line)
+            category_match = re.search(r'!(.*?)\s*(\(|\[|$)', each_line)
+
             if category_match:
                 current_group['name'] = category_match.group(1)
                 current_group['type'] = 'Items'
+
+                # Get Group Option Links
+                optlink_match = re.search(r'\((.*?)\)', each_line)
+                option_links = [optlink_match.group(1).strip().split(',') if optlink_match else None][0]
+
+                # Check if group is a multicost group
+                colname_match = re.search(r'\[(.*?)\]', each_line)
+                column_name = [colname_match.group(1).strip().split(',') if colname_match else None][0]
+
             else:
                 current_group = {'name': None, 'type': None}
-            
+                option_links = column_name = None
+                print('Group is undefined')
+                
 
 
         elif each_line[0] == '?': # define option group
@@ -56,6 +68,7 @@ def convert_text(text_chunk):
 
                 current_group['name'] = option_group
                 current_group['type'] = 'Options'
+                option_links = None
 
                 if option_group not in option_grps_df['Option Groups'] and grp_settings_match:
                     # find the allocation of option grp settings
@@ -110,7 +123,10 @@ def convert_text(text_chunk):
 
                 if bracket:
                     option_groups = bracket[0].split(',')
-                    items_df['Option Groups'].append(option_groups)
+                    items_df['Option Groups'].append(option_links + option_groups)
+
+                elif option_links:
+                    items_df['Option Groups'].append(option_links)
 
                 else:
                     items_df['Option Groups'].append([])
