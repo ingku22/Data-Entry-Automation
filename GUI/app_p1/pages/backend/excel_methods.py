@@ -29,6 +29,7 @@ class ExcelHandler:
         num_of_sheets = len(self.excel_file.sheet_names)
         if self.sheetNo + adj >= 0 and self.sheetNo + adj < num_of_sheets:
             self.sheetNo += adj
+            self.frame = None
             self.loadSheet(canvas, label, x, y, width, height)
 
     def uploadExcel(self):
@@ -124,6 +125,7 @@ class ExcelHandler:
 
     def loadSheet(self, canvas, label, x, y, width, height):
         if not self.frame:
+            print("A")
             # Create a Frame to hold the Treeview and Scrollbar
             self.frame = Frame(canvas)
             self.frame.place(x=x, y=y, width=width, height=height)
