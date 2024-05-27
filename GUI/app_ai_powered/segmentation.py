@@ -4,8 +4,41 @@ import re
 import openpyxl
 
 # Functions
-def format_to_excel():
-    pass
+def format_to_excel(text_chunk):
+    items_df, option_grps_df, options_df = convert_text(text_chunk)
+
+    # Get statistics for converted Excel
+    stats = {
+        'Category': len(set(items_df['Category'])),
+        'Menu Items': len(items_df['Menu Item']),
+        'Option Groups': len(option_grps_df['Option Groups']),
+        'Options': len(options_df['Option'])
+    }
+
+    # Get columns of each table
+    columns = {
+        "Items": ["Category", "Menu Item", "Description", "Costs", "Option Groups"],
+        "Option Group": ["Option Groups", "Single", "Mandatory"],
+        "Options": ["Option Group", "Option", "Cost"]
+    }
+
+    # Get data of each table
+    zipped_items = zip(items_df['Category'], items_df['Menu Item'], 
+                       items_df['Description'], items_df['Costs'],
+                       [', '.join(groups) for groups in items_df['Option Groups']])
+    
+    zipped_grps = zip(option_grps_df['Option Groups'], option_grps_df['Single'],
+                      option_grps_df['Mandatory'])
+    
+    zipped_options = zip(options_df['Option Group'], options_df['Option'],
+                         options_df['Cost'])
+    
+
+    data = {'Items': [list(item) for item in zipped_items], 
+            'Option Group': [list(grp) for grp in zipped_grps], 
+            'Options': [list(opt) for opt in zipped_options]}
+
+    return data, columns, stats
 
 def convert_text(text_chunk):
     # Needed Variables
@@ -145,9 +178,11 @@ def convert_text(text_chunk):
                     print('Option Cost is not compatible with the cost')
 
 
-    print('Items:',items_df)
-    print('\nOption Groups:', option_grps_df)
-    print('\nOptions:', options_df)
+    # print('Items:',items_df)
+    # print('\nOption Groups:', option_grps_df)
+    # print('\nOptions:', options_df)
+
+    return items_df, option_grps_df, options_df
 
 
 
@@ -171,7 +206,7 @@ def get_items_set(text_chunk:str):
 
 
 
-with open('test.txt') as test:
-    test_text = test.read()
+# with open('test.txt') as test:
+#     test_text = test.read()
 
-    convert_text(test_text)
+#     format_to_excel(test_text)
