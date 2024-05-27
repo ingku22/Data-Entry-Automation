@@ -146,8 +146,8 @@ def convert_text(text_chunk):
 
 
     print('Items:',items_df)
-    print('Option Groups:', option_grps_df)
-    print('Options:', options_df)
+    print('\nOption Groups:', option_grps_df)
+    print('\nOptions:', options_df)
 
 
 

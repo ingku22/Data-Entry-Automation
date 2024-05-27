@@ -254,15 +254,16 @@ class gemini_excel_generator:
             278.5,
             image=self.entry_image_3
         )
-        self.entry_3 = Text(
+        self.text_formatted_menu = Text(
             self.canvas,
             bd=0,
             bg="#FFFFFF",
             fg="#000716",
             highlightthickness=0,
-            pady=10
+            pady=10,
+            font=('Arial', 11)
         )
-        self.entry_3.place(
+        self.text_formatted_menu.place(
             x=37.0,
             y=117.0,
             width=210.0,
@@ -318,7 +319,7 @@ class gemini_excel_generator:
             image=self.button_image_8,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_8 clicked"),
+            command=self.add_category,
             relief="flat"
         )
         self.button_8.place(
@@ -335,7 +336,7 @@ class gemini_excel_generator:
             image=self.button_image_9,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_9 clicked"),
+            command=self.add_option_group,
             relief="flat"
         )
         self.button_9.place(
@@ -390,6 +391,16 @@ class gemini_excel_generator:
         self.generate_btn.config(command=self.generate_excel)
         self.delete_excel_btn.config(command=self.remove_excel)
         self.download_btn.config(command=self.download_excel)
+
+
+    # Text format editor
+    def add_category(self):
+        print('Added Category')
+        self.text_formatted_menu.insert(END, '\n!')
+
+    def add_option_group(self):
+        print('Added Option Group')
+        self.text_formatted_menu.insert(END, '\n?')
 
     # Excel Function
     # Methodology (per image in images):
