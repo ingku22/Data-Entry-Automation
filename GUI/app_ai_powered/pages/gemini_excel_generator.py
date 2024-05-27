@@ -5,6 +5,7 @@ from pathlib import Path
 # from tkinter import *
 from tkinter import Canvas, Button, PhotoImage, Frame, BOTH, Text, Entry, Label, messagebox, END
 from backend.excel_methods import ExcelHandler
+from segmentation import format_to_excel
 import webbrowser
 
 excel_handler = ExcelHandler()
@@ -407,20 +408,12 @@ class gemini_excel_generator:
     # get image path -> ocr -> ocr sorting -> transfer into dataframe -> transfer into treeview -> display treeview
     def generate_excel(self):
         print('Generating Excel File')
-       
-       ## Change these to the data generated from scanning the image
-        data = {
-            "Items": [["Mala", "Mala", "none", 3.5, "Soup or Dry,Spicy Level,Ingredient"], ["Grilled Fish", "Grilled Fish", "none", 27.2, "Fish Flavour,Grilled Fish Addon"]],
-            "Option Group": [["Soup or Dry", True, True], ["Spicy Level", True, True]],
-            "Options": [["Soup or Dry", "Dry", 0], ["Soup or Dry", "Soup", 1], ["Spicy Level", "Level 1 - Less Spicy", 0]]
-        }
 
-
-        columns = { 
-                "Items": ["Category", "Menu Item", "Description", "Costs", "Option Groups"],
-                "Option Group": ["Option Groups", "Single", "Mandatory"],
-                "Options": ["Option Group", "Option", "Cost"]
-            }
+        ## Copy input when Generate Excel button is clicked and convert
+        text_to_convert = self.text_formatted_menu.get("1.0", 'end-1c')
+        self.text_formatted_menu.delete("1.0", 'end')
+        data, columns, stats = format_to_excel(text_to_convert)
+        
         excel_handler.dataframe_to_excel(data, columns)
         excel_handler.loadSheet(self.canvas, self.label, 300, 107.5, 380, 245)
         # transfer into treeview
@@ -438,6 +431,7 @@ class gemini_excel_generator:
         self.excel_stat.insert(END, DUMMY_STATS_DATA)
         self.excel_stat.config(state='disabled')
         self.download_btn.config(state='normal')
+
 
     def remove_excel(self):
         print('Excel Removed.')
