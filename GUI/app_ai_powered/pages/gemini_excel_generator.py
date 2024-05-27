@@ -149,7 +149,9 @@ class gemini_excel_generator:
             bd=0,
             bg="#8D8D8D",
             fg="#000716",
-            highlightthickness=0
+            highlightthickness=0,
+            pady=5,
+            font=('Arial', 9)
         )
         self.excel_stat.place(
             x=320.0,
@@ -262,7 +264,7 @@ class gemini_excel_generator:
             fg="#000716",
             highlightthickness=0,
             pady=10,
-            font=('Arial', 11)
+            font=('Arial', 10)
         )
         self.text_formatted_menu.place(
             x=37.0,
@@ -409,6 +411,12 @@ class gemini_excel_generator:
     def generate_excel(self):
         print('Generating Excel File')
 
+        # If there is a current excel, try to remove it to prevent syntax errors
+        try:
+            self.remove_excel(show_error=False)
+        except:
+            pass
+
         ## Copy input when Generate Excel button is clicked and convert
         text_to_convert = self.text_formatted_menu.get("1.0", 'end-1c')
         self.text_formatted_menu.delete("1.0", 'end')
@@ -425,7 +433,14 @@ class gemini_excel_generator:
         # )
 
         # show statistics of the treeview
-        DUMMY_STATS_DATA = '\nGENERATED REPORT\n=================\nCategory: 4\nMenu Items: 12\nOption grp: 3\nOptions: 10\n\nFile Size: 4KB'
+        DUMMY_STATS_DATA = f'''GENERATED REPORT
+=================
+Category: {stats['Category']}
+Menu Items: {stats['Menu Items']}
+Option grp: {stats['Option Groups']}
+Options: {stats['Options']}
+        
+File Size: 4KB'''
         
         self.excel_stat.delete(1.0, END)
         self.excel_stat.insert(END, DUMMY_STATS_DATA)
@@ -433,7 +448,7 @@ class gemini_excel_generator:
         self.download_btn.config(state='normal')
 
 
-    def remove_excel(self):
+    def remove_excel(self, show_error=True):
         print('Excel Removed.')
         try:
             excel_handler.deleteSheet()
@@ -444,7 +459,8 @@ class gemini_excel_generator:
             self.file_name_entry.delete(0, END)
             self.download_btn.config(state='disabled')
         except:
-            messagebox.showerror(title='AttributeError', message='application has no attribute "excel_preview_table".')
+            if show_error:
+                messagebox.showerror(title='AttributeError', message='application has no attribute "excel_preview_table".')
 
 
     def download_excel(self):
