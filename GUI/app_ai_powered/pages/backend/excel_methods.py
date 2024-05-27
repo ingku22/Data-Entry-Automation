@@ -28,6 +28,7 @@ class ExcelHandler:
     def changeSheet(self, adj, canvas, label, x, y, width, height):
         num_of_sheets = len(self.excel_file.sheet_names)
         if self.sheetNo + adj >= 0 and self.sheetNo + adj < num_of_sheets:
+            self.frame = None
             self.sheetNo += adj
             self.loadSheet(canvas, label, x, y, width, height)
 
