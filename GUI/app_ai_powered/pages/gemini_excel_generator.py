@@ -419,7 +419,6 @@ class gemini_excel_generator:
 
         ## Copy input when Generate Excel button is clicked and convert
         text_to_convert = self.text_formatted_menu.get("1.0", 'end-1c')
-        self.text_formatted_menu.delete("1.0", 'end')
         data, columns, stats = format_to_excel(text_to_convert)
         
         excel_handler.dataframe_to_excel(data, columns)
@@ -470,6 +469,16 @@ File Size: 4KB'''
             # download the file
             self.excel_name = set_file_name
             print(f'File Name: {self.excel_name}')
+
+            text_to_convert = self.text_formatted_menu.get("1.0", 'end-1c')
+            data, columns, stats = format_to_excel(text_to_convert)
+
+            excel_handler.download_named_excel(data, columns, self.excel_name)
+            messagebox.showinfo(title='Success',
+                                    message=f'{self.excel_name}.xlsx Downloaded Successfully')
+        else:
+            messagebox.showerror(title='DataFormatError',
+                                    message='Please name your excel file.')
 
 
     # Page Functions

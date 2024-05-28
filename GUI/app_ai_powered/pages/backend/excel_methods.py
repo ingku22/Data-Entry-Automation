@@ -39,6 +39,19 @@ class ExcelHandler:
         if self.file_path:
             self.excel_file = pd.ExcelFile(self.file_path)
 
+    def download_named_excel(self, data, columns, filename):
+        workbook = openpyxl.Workbook()
+        workbook.save(f"{filename}.xlsx")
+
+        with pd.ExcelWriter(f"{filename}.xlsx") as writer:
+            for sheet_name in columns:
+                df = pd.DataFrame(data[sheet_name], columns = columns[sheet_name])
+                df.to_excel(writer, sheet_name=sheet_name, index=False)
+            
+        self.file_path = filename + ".xlsx"
+        self.excel_file = pd.ExcelFile(self.file_path)
+        
+
     def dataframe_to_excel(self, data, columns):
 
         if not os.path.isfile("output.xlsx"):
