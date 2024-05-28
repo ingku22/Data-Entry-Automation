@@ -352,7 +352,7 @@ class gemini_excel_generator:
         self.init_button_commands()
 
     def copy_to_clipboard(self):
-        text_to_copy = "eat shit"
+        text_to_copy = "Extract the Menu Items and Costs from the menu image. First Identify the Category as 'category'. Then format them in this particular way 'Menu item - costs' with no cost denotations or descriptions. If there are more than one cost for a menu item, put it in this order 'cost 1, cost 2, cost 3', else if there are choices, put them in a bracket as such '(choice 1: cost 1, choice 2: cost 2, choice 3: cost 3)'"
         self.window.clipboard_clear()
         self.window.clipboard_append(text_to_copy)
         self.window.update()
