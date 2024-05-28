@@ -449,16 +449,11 @@ class gemini_excel_generator:
 
     def download_excel(self):
         set_file_name = self.file_name_entry.get().lstrip().rstrip()
-
         # Check for missing values
         if set_file_name not in ['', None]:
             # download the file
             self.excel_name = set_file_name
             print(f'File Name: {self.excel_name}')
-
-        else:
-            messagebox.showerror(title='DataFormatError',
-                                    message='Please name your excel file.')
 
 
     # Page Functions
