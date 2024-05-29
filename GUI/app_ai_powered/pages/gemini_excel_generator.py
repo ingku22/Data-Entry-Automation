@@ -7,6 +7,7 @@ from tkinter import Canvas, Button, PhotoImage, Frame, BOTH, Text, Entry, Label,
 from backend.excel_methods import ExcelHandler
 from segmentation import format_to_excel
 import webbrowser
+import os
 
 excel_handler = ExcelHandler()
 
@@ -470,10 +471,14 @@ File Size: 4KB'''
             self.excel_name = set_file_name
             print(f'File Name: {self.excel_name}')
 
+            downloads_folder = str(Path.home() / "Downloads")
+            full_file_path = os.path.join(downloads_folder, f"{self.excel_name}.xlsx")
+
             text_to_convert = self.text_formatted_menu.get("1.0", 'end-1c')
             data, columns, stats = format_to_excel(text_to_convert)
 
-            excel_handler.download_named_excel(data, columns, self.excel_name)
+            excel_handler.download_named_excel(data, columns, full_file_path)
+            self.file_name_entry.delete(0, END)
             messagebox.showinfo(title='Success',
                                     message=f'{self.excel_name}.xlsx Downloaded Successfully')
         else:
