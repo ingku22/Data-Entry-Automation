@@ -77,7 +77,7 @@ def convert_text(text_chunk):
 
                 # Get Group Option Links
                 optlink_match = re.search(r'\((.*?)\)', each_line)
-                option_links = [optlink_match.group(1).strip().split(',') if optlink_match else None][0]
+                option_links = [optlink_match.group(1).strip().split(',') if optlink_match else []][0]
 
                 # Check if group is a multicost group
                 colname_match = re.search(r'\[(.*?)\]', each_line)
