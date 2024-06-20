@@ -125,7 +125,6 @@ class ExcelHandler:
 
     def loadSheet(self, canvas, label, x, y, width, height):
         if not self.frame:
-            print("A")
             # Create a Frame to hold the Treeview and Scrollbar
             self.frame = Frame(canvas)
             self.frame.place(x=x, y=y, width=width, height=height)
