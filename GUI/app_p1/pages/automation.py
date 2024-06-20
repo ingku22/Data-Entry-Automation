@@ -7,7 +7,7 @@ from pathlib import Path
 import pandas as pd
 from tkinter import Canvas, Button, PhotoImage, Frame, BOTH, Toplevel, Label
 from idlelib.tooltip import Hovertip
-from backend.automationprocess import automation_process
+from backend.automationprocess import create_input
 from backend.excel_methods import ExcelHandler
 from backend.display_methods import hideElement, showElement
 
@@ -105,7 +105,7 @@ class automation:
             borderwidth=0,
             highlightthickness=0,
             state="disabled",
-            command=lambda: automation_process(excel_handler.file_path),
+            command=lambda: create_input(excel_handler.file_path),
             relief="flat"
         )
         self.automate_btn.place(
@@ -339,6 +339,3 @@ class automation:
         
             close_button = Button(popup, text="Close", command=popup.destroy)
             close_button.pack(pady=10)
-        
-        else:
-            print("Okayge")
